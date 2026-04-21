@@ -235,20 +235,6 @@ export default function App() {
   const [profilePic, setProfilePic] = useState<string | null>(null);
   const [initStatus, setInitStatus] = useState<"loading" | "error" | "complete">("loading");
   const [progress, setProgress] = useState(0);
-  const [isMobileDevice, setIsMobileDevice] = useState(false);
-
-  // Check for mobile device or small screen
-  useEffect(() => {
-    const checkMobile = () => {
-      const mobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-      const smallScreen = window.innerWidth < 1024;
-      setIsMobileDevice(mobileUA || smallScreen);
-    };
-    
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
 
   const handlePrint = () => window.open('https://drive.google.com/file/d/11nczQcN9Gfn_VOHpnzg4B6IKOZXnXFaT/view', '_blank');
 
@@ -402,8 +388,22 @@ export default function App() {
     initializeApp();
   }, []);
 
-  // Handle scroll jacking for horizontal page navigation
+  // Handle scroll and touch for horizontal page navigation
+  const touchStartX = useRef(0);
+  const touchEndX = useRef(0);
+
   useEffect(() => {
+    const scrollToDirection = (direction: number) => {
+      const nextPage = Math.max(0, Math.min(totalPages - 1, currentPage + direction));
+      if (nextPage !== currentPage) {
+        isScrolling.current = true;
+        setCurrentPage(nextPage);
+        setTimeout(() => {
+          isScrolling.current = false;
+        }, 1250); 
+      }
+    };
+
     const handleWheel = (e: WheelEvent) => {
       e.preventDefault();
       if (isScrolling.current) return;
@@ -413,21 +413,37 @@ export default function App() {
 
       // Determine direction: down -> forward, up -> backward
       const direction = e.deltaY > 0 ? 1 : -1;
-      const nextPage = Math.max(0, Math.min(totalPages - 1, currentPage + direction));
+      scrollToDirection(direction);
+    };
 
-      if (nextPage !== currentPage) {
-        isScrolling.current = true;
-        setCurrentPage(nextPage);
-        
-        // Cooldown matches the transition duration to prevent skipping
-        setTimeout(() => {
-          isScrolling.current = false;
-        }, 1250); 
+    const handleTouchStart = (e: TouchEvent) => {
+      touchStartX.current = e.changedTouches[0].screenX;
+    };
+
+    const handleTouchEnd = (e: TouchEvent) => {
+      touchEndX.current = e.changedTouches[0].screenX;
+      if (isScrolling.current) return;
+      
+      const swipeThreshold = 50;
+      if (touchEndX.current < touchStartX.current - swipeThreshold) {
+        // swipe left -> forward
+        scrollToDirection(1);
+      }
+      if (touchEndX.current > touchStartX.current + swipeThreshold) {
+        // swipe right -> backward
+        scrollToDirection(-1);
       }
     };
 
     window.addEventListener("wheel", handleWheel, { passive: false });
-    return () => window.removeEventListener("wheel", handleWheel);
+    window.addEventListener("touchstart", handleTouchStart, { passive: true });
+    window.addEventListener("touchend", handleTouchEnd, { passive: true });
+    
+    return () => {
+      window.removeEventListener("wheel", handleWheel);
+      window.removeEventListener("touchstart", handleTouchStart);
+      window.removeEventListener("touchend", handleTouchEnd);
+    };
   }, [currentPage, totalPages]);
 
   const scrollToPage = (index: number) => {
@@ -442,28 +458,6 @@ export default function App() {
   return (
     <>
       <CustomCursor />
-      
-      {/* Mobile Block Overlay */}
-      {isMobileDevice && (
-        <div className="fixed inset-0 z-[100000] bg-[#05070a] flex flex-col items-center justify-center p-8 text-center text-white">
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="flex flex-col items-center"
-          >
-            <div className="w-16 h-16 bg-[#990000]/20 rounded-full flex items-center justify-center mb-6">
-              <div className="w-3 h-3 bg-[#ff0000] rounded-full animate-pulse" />
-            </div>
-            <h2 className="text-[#990000] text-xl font-bold tracking-widest mb-4 uppercase">
-              Desktop Only
-            </h2>
-            <p className="text-white/60 text-sm font-medium max-w-[17.5rem] leading-relaxed">
-              This site isn't supported to be viewed on mobile devices, sorry :(
-            </p>
-            <div className="mt-8 h-[1px] bg-[#990000]/30 w-24" />
-          </motion.div>
-        </div>
-      )}
 
       <AnimatePresence>
         {initStatus !== "complete" && (
@@ -598,7 +592,7 @@ export default function App() {
         transition={{ duration: 1.25, ease: APPLE_EASE }}
       >
         {/* Page 1: Intro (Image 6) */}
-        <section className="w-screen h-screen flex-shrink-0 flex flex-col justify-center px-16 md:px-32 relative">
+        <section className="w-screen h-screen overflow-y-auto no-scrollbar flex-shrink-0 flex flex-col justify-center px-6 sm:px-16 md:px-32 relative">
           <motion.div
             variants={staggerContainer}
             initial="hidden"
@@ -606,12 +600,12 @@ export default function App() {
             className="space-y-0"
           >
             <div className="overflow-hidden py-2">
-              <motion.h1 variants={textReveal} className="text-8xl md:text-[10rem] font-bold tracking-tighter leading-[0.8]">Esteban</motion.h1>
+              <motion.h1 variants={textReveal} className="text-6xl sm:text-7xl lg:text-8xl 2xl:text-[10rem] font-bold tracking-tighter leading-[0.8]">Esteban</motion.h1>
             </div>
             <div className="overflow-hidden py-2">
-              <motion.h1 variants={textReveal} className="text-8xl md:text-[10rem] font-bold tracking-tighter leading-[0.8] text-[#990000]">Erazo Narváez</motion.h1>
+              <motion.h1 variants={textReveal} className="text-6xl sm:text-7xl lg:text-8xl 2xl:text-[10rem] font-bold tracking-tighter leading-[0.8] text-[#990000]">Erazo Narváez</motion.h1>
             </div>
-            <motion.div variants={fadeUp} className="flex gap-4 text-3xl md:text-5xl font-bold text-[#4a0000] pt-8">
+            <motion.div variants={fadeUp} className="flex flex-col sm:flex-row gap-2 sm:gap-4 text-lg sm:text-2xl lg:text-3xl 2xl:text-5xl font-bold text-[#4a0000] pt-8">
               <span>Ingeniero en Sistemas</span>
               <span>Especialista en Seguridad Informática</span>
             </motion.div>
@@ -638,28 +632,28 @@ export default function App() {
 
         {/* Page 2: Phrase (Image 5) */}
         {/*rem Generar impacto para la frase, puede ir en escalada*/}
-        <section className="w-screen h-screen flex-shrink-0 flex flex-col justify-center px-16 md:px-32 relative">
+        <section className="w-screen h-screen overflow-y-auto no-scrollbar flex-shrink-0 flex flex-col justify-center px-6 sm:px-16 md:px-32 relative">
           <motion.div
             variants={staggerContainer}
             initial="hidden"
             animate={currentPage === 1 ? "visible" : "hidden"}
-            className="space-y-2"
+            className="space-y-2 mt-20"
           >
             <div className="overflow-hidden flex">
-              <InteractiveWord text="NO LLORES PORQUE" className="text-7xl md:text-[4rem] font-bold tracking-tighter leading-none" />
+              <InteractiveWord text="NO LLORES PORQUE" className="text-3xl sm:text-5xl md:text-7xl lg:text-[4rem] font-bold tracking-tighter leading-none" />
             </div>
-            <div className="overflow-hidden ml-24 md:ml-48 flex">
-              <InteractiveWord text="TERMINÓ, SONRIE" className="text-7xl md:text-[8rem] font-bold tracking-tighter leading-none" />
+            <div className="overflow-hidden ml-8 sm:ml-24 md:ml-48 flex">
+              <InteractiveWord text="TERMINÓ, SONRIE" className="text-4xl sm:text-6xl md:text-7xl lg:text-[8rem] font-bold tracking-tighter leading-none" />
             </div>
             <div className="overflow-hidden flex">
-              <InteractiveWord text="PORQUE SUCEDIÓ" className="text-7xl md:text-[12rem] font-bold tracking-tighter leading-none" />
+              <InteractiveWord text="PORQUE SUCEDIÓ" className="text-4xl sm:text-7xl md:text-[9rem] lg:text-[12rem] font-bold tracking-tighter leading-none" />
             </div>
           </motion.div>
           <motion.div 
             variants={fadeUp}
             initial="hidden"
             animate={currentPage === 1 ? "visible" : "hidden"}
-            className="absolute bottom-24 right-16 md:right-32 text-right"
+            className="absolute bottom-32 sm:bottom-24 right-8 sm:right-16 md:right-32 text-right"
           >
             <p className="text-xl font-bold opacity-80">Dr. Seuss / 1980 (Aprox.)</p>
             <motion.div 
@@ -673,18 +667,18 @@ export default function App() {
         </section>
 
         {/* Page 3: About (Image 1) */}
-        <section className="w-screen h-screen flex-shrink-0 flex items-center px-16 md:px-32 relative">
-          <div className="flex flex-col md:flex-row w-full items-stretch justify-center">
+        <section className="w-screen h-screen overflow-y-auto no-scrollbar flex-shrink-0 flex items-start md:items-center px-6 sm:px-16 md:px-32 relative py-24 md:py-0">
+          <div className="flex flex-col md:flex-row w-full items-stretch justify-center gap-8 md:gap-0">
             
             {/* Column 1 */}
             <motion.div
               variants={staggerContainer}
               initial="hidden"
               animate={currentPage === 2 ? "visible" : "hidden"}
-              className="flex-1 flex flex-col justify-start md:pr-12 border-b-[3px] md:border-b-0 md:border-r-[3px] border-[#4a0000] py-8 md:py-0"
+              className="flex-1 flex flex-col justify-start md:pr-12 md:border-r-[3px] border-[#4a0000] py-4 md:py-0"
             >
               <div className="overflow-hidden py-2">
-                <motion.h3 variants={textReveal} className="text-5xl md:text-6xl font-bold leading-none tracking-tighter">¿Quién<br />soy?</motion.h3>
+                <motion.h3 variants={textReveal} className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-none tracking-tighter">¿Quién<br className="hidden md:block" />soy?</motion.h3>
               </div>
               <motion.div variants={fadeUp} className="mt-8 space-y-4 text-sm md:text-base text-white/70 font-medium leading-relaxed">
                 <p>
@@ -701,10 +695,10 @@ export default function App() {
               variants={staggerContainer}
               initial="hidden"
               animate={currentPage === 2 ? "visible" : "hidden"}
-              className="flex-1 flex flex-col justify-start md:px-12 border-b-[3px] md:border-b-0 md:border-r-[3px] border-[#4a0000] py-8 md:py-0"
+              className="flex-1 flex flex-col justify-start md:px-12 md:border-r-[3px] border-[#4a0000] py-4 md:py-0"
             >
               <div className="overflow-hidden py-2">
-                <motion.h3 variants={textReveal} className="text-5xl md:text-6xl font-bold leading-none tracking-tighter">¿Qué es lo<br />que me motiva?</motion.h3>
+                <motion.h3 variants={textReveal} className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-none tracking-tighter">¿Qué es lo<br className="hidden md:block" />que me motiva?</motion.h3>
               </div>
               <motion.div variants={fadeUp} className="mt-8 space-y-4 text-sm md:text-base text-white/70 font-medium leading-relaxed">
                 <p>
@@ -721,10 +715,10 @@ export default function App() {
               variants={staggerContainer}
               initial="hidden"
               animate={currentPage === 2 ? "visible" : "hidden"}
-              className="flex-1 flex flex-col justify-start md:pl-12 py-8 md:py-0"
+              className="flex-1 flex flex-col justify-start md:pl-12 py-4 md:py-0"
             >
               <div className="overflow-hidden py-2">
-                <motion.h3 variants={textReveal} className="text-5xl md:text-6xl font-bold leading-none tracking-tighter">Mis <br />Habilidades</motion.h3>
+                <motion.h3 variants={textReveal} className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-none tracking-tighter">Mis <br className="hidden md:block" />Habilidades</motion.h3>
               </div>
               <motion.div variants={fadeUp} className="mt-8 flex flex-wrap gap-3">
                 {skills.map((skill, i) => (
@@ -791,7 +785,7 @@ export default function App() {
                     )}
                   </div>
 
-                  <div className="relative z-10 space-y-12">
+                  <div className="relative z-10 space-y-8 md:space-y-12">
                     <div className="space-y-0">
                       <div className="overflow-hidden py-2">
                         <motion.h4 
@@ -799,7 +793,7 @@ export default function App() {
                           animate={{ y: 0, opacity: 1 }}
                           exit={{ y: -50, opacity: 0 }}
                           transition={{ duration: 0.8, ease: APPLE_EASE, delay: 0.1 }}
-                          className="text-8xl md:text-[10rem] font-bold tracking-tighter leading-[0.8] uppercase"
+                          className="text-5xl sm:text-7xl lg:text-[10rem] font-bold tracking-tighter leading-[0.9] uppercase"
                         >
                           {project.name}
                         </motion.h4>
@@ -812,8 +806,8 @@ export default function App() {
                       transition={{ duration: 0.8, ease: APPLE_EASE, delay: 0.2 }}
                       className="space-y-4"
                     >
-                      <p className="text-3xl text-[#990000] font-bold tracking-tight">{project.short_description}</p>
-                      <p className="text-xl text-white/50 max-w-2xl font-medium">
+                      <p className="text-xl sm:text-3xl text-[#990000] font-bold tracking-tight">{project.short_description}</p>
+                      <p className="text-base sm:text-xl text-white/50 max-w-2xl font-medium">
                         {project.long_description}
                       </p>
                     </motion.div>
@@ -825,7 +819,7 @@ export default function App() {
         </section>
 
         {/* Final Page: CV (Image 3) */}
-        <section className="w-screen h-screen flex-shrink-0 flex items-center justify-center px-16 md:px-32 relative">
+        <section className="w-screen h-screen overflow-y-auto no-scrollbar flex-shrink-0 flex items-start md:items-center justify-center px-6 sm:px-16 md:px-32 relative py-24 md:py-0">
           <motion.div
             variants={staggerContainer}
             initial="hidden"
@@ -835,7 +829,7 @@ export default function App() {
             {/* Left Column: Contact Info */}
             <motion.div variants={fadeUp} className="md:col-span-4 flex flex-col items-center text-center space-y-6">
               {/* Profile Picture */}
-              <div className="w-48 h-48 rounded-full bg-[#1a1a1a] flex items-center justify-center overflow-hidden shadow-[0_0_1.875rem_rgba(153,0,0,0.3)]">
+              <div className="w-32 h-32 md:w-48 md:h-48 rounded-full bg-[#1a1a1a] flex items-center justify-center overflow-hidden shadow-[0_0_1.875rem_rgba(153,0,0,0.3)]">
                 <img 
                   src={profilePic || "https://picsum.photos/seed/esteban/400/400"} 
                   alt="Esteban Erazo" 
@@ -882,9 +876,9 @@ export default function App() {
             </motion.div>
 
             {/* Right Column: CV PDF */}
-            <motion.div variants={fadeUp} className="md:col-span-8 flex flex-col h-[80vh] w-full">
+            <motion.div variants={fadeUp} className="md:col-span-8 flex flex-col h-[60vh] md:h-[80vh] w-full">
               <div className="overflow-hidden py-2 mb-6">
-                <motion.h5 variants={textReveal} className="text-5xl md:text-7xl font-bold tracking-tighter text-center">Curriculum Vitae</motion.h5>
+                <motion.h5 variants={textReveal} className="text-4xl sm:text-5xl md:text-7xl font-bold tracking-tighter text-center">Curriculum Vitae</motion.h5>
               </div>
               
               <div className="flex-1 flex flex-col shadow-2xl w-full border-2 border-black rounded-lg overflow-hidden group/pdf">
