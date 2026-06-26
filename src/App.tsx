@@ -173,6 +173,15 @@ interface Skill {
   name: string;
 }
 
+interface Certificate {
+  id_certificate: number;
+  name: string;
+  date_completion: string;
+  certificate_url: string;
+  certificate_logo: string;
+  certificate_issuer: string;
+}
+
 // Reusable animation variants
 const staggerContainer = {
   hidden: { opacity: 0 },
@@ -232,6 +241,7 @@ export default function App() {
   const isScrolling = useRef(false);
   const [projects, setProjects] = useState<Project[]>([]);
   const [skills, setSkills] = useState<Skill[]>([]);
+  const [certificates, setCertificates] = useState<Certificate[]>([]);
   const [profilePic, setProfilePic] = useState<string | null>(null);
   const [initStatus, setInitStatus] = useState<"loading" | "error" | "complete">("loading");
   const [progress, setProgress] = useState(0);
@@ -247,9 +257,12 @@ export default function App() {
     return () => window.removeEventListener("contextmenu", handleContextMenu);
   }, []);
 
-  const totalPages = 3 + Math.max(1, projects.length) + 1;
-  const isProjectPage = currentPage >= 3 && currentPage < totalPages - 1;
-  const bgState = isProjectPage ? "project" : (currentPage === totalPages - 1 ? "cv" : currentPage.toString());
+  const projectPagesCount = Math.max(1, projects.length);
+  const certPagesCount = Math.max(1, Math.ceil(certificates.length / 6));
+  const totalPages = 3 + projectPagesCount + certPagesCount + 1;
+  const isProjectPage = currentPage >= 3 && currentPage < 3 + projectPagesCount;
+  const isCertPage = currentPage >= 3 + projectPagesCount && currentPage < totalPages - 1;
+  const bgState = isProjectPage ? "project" : isCertPage ? "certs" : (currentPage === totalPages - 1 ? "cv" : currentPage.toString());
 
   // Initialize App and Fetch Data
   useEffect(() => {
@@ -268,6 +281,14 @@ export default function App() {
             long_description: "Sample Text"
           }]);
           setSkills([{ name: "React" }, { name: ".NET" }, { name: "SQL" }, { name: "C#" }, { name: "TypeScript" }]);
+          setCertificates([{
+            id_certificate: -1,
+            name: "Sample Certificate",
+            date_completion: "2024-01-01",
+            certificate_url: "#",
+            certificate_logo: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=600&h=400&fit=crop&q=80",
+            certificate_issuer: "Sample Issuer"
+          }]);
           await new Promise(r => setTimeout(r, 800)); // Simulate loading delay
           setProgress(100);
           setTimeout(() => setInitStatus("complete"), 600);
@@ -355,6 +376,25 @@ export default function App() {
         }
 
         setProgress(80);
+
+        // Fetch Certificates
+        const { data: certData, error: certError } = await supabase
+          .from("certificates")
+          .select("*")
+          .order('date_completion', { ascending: false });
+        
+        if (certError) throw certError;
+        
+        // Ensure manual descending sort in case of API anomalies
+        const sortedCerts = (certData || []).sort((a, b) => {
+          const dateA = a.date_completion ? new Date(a.date_completion).getTime() : 0;
+          const dateB = b.date_completion ? new Date(b.date_completion).getTime() : 0;
+          return dateB - dateA;
+        });
+        
+        setCertificates(sortedCerts);
+
+        setProgress(90);
 
         // Preload valid background images
         const imageUrls = projectsData?.map(p => p.bg_photo).filter(Boolean) as string[] || [];
@@ -560,16 +600,16 @@ export default function App() {
       {/* Page indicators */}
       <div className="fixed top-12 left-12 z-50 pointer-events-none overflow-hidden">
         <AnimatePresence mode="wait">
-          {((currentPage === 2) || (currentPage >= 3 && currentPage < totalPages - 1)) && (
+          {((currentPage === 2) || isProjectPage || isCertPage) && (
             <motion.div
-              key={currentPage === 2 ? "myself" : "mywork"}
+              key={currentPage === 2 ? "myself" : isCertPage ? "certs" : "mywork"}
               initial={{ y: 30, opacity: 0, x: -10 }}
               animate={{ y: 0, opacity: 1, x: 0 }}
               exit={{ y: -30, opacity: 0, x: 10 }}
               transition={{ duration: 0.4, ease: APPLE_EASE }}
             >
               <span className="text-[#990000] font-bold tracking-[0.3em] block">
-                {currentPage === 2 ? "Myself" : "My Work"}
+                {currentPage === 2 ? "Myself" : isCertPage ? "Certifications" : "My Work"}
               </span>
             </motion.div>
           )}
@@ -579,14 +619,16 @@ export default function App() {
       {/* Main horizontal sliding container */}
       <motion.div
         className="flex h-full relative z-10"
-        style={{ width: `500vw` }}
+        style={{ width: `${(5 + certPagesCount) * 100}vw` }}
         animate={{ 
           x: `-${
             currentPage < 3 
               ? currentPage * 100 
-              : currentPage >= 3 && currentPage < totalPages - 1 
+              : isProjectPage 
                 ? 300 
-                : 400
+                : isCertPage
+                  ? 400 + (currentPage - (3 + projectPagesCount)) * 100
+                  : 400 + certPagesCount * 100
           }vw` 
         }}
         transition={{ duration: 1.25, ease: APPLE_EASE }}
@@ -655,7 +697,7 @@ export default function App() {
             animate={currentPage === 1 ? "visible" : "hidden"}
             className="absolute bottom-32 sm:bottom-24 right-8 sm:right-16 md:right-32 text-right"
           >
-            <p className="text-xl font-bold opacity-80">Dr. Seuss / 1980 (Aprox.)</p>
+            <p className="text-xl font-bold opacity-80">Dr. Seuss / 1980` ~`</p>
             <motion.div 
               initial={{ scaleX: 0 }}
               animate={currentPage === 1 ? { scaleX: 1 } : { scaleX: 0 }}
@@ -817,6 +859,88 @@ export default function App() {
             })}
           </AnimatePresence>
         </section>
+
+        {/* Certifications Pages */}
+        {Array.from({ length: certPagesCount }).map((_, pageIndex) => {
+          const certsForPage = certificates.slice(pageIndex * 6, (pageIndex + 1) * 6);
+          const actualPageIndex = 3 + projectPagesCount + pageIndex;
+
+          return (
+            <section key={pageIndex} className="w-screen h-screen overflow-y-auto no-scrollbar flex-shrink-0 flex items-start md:items-center px-6 sm:px-16 md:px-32 relative py-24 md:py-0">
+              <div className="flex flex-col md:flex-row w-full max-w-7xl mx-auto items-stretch justify-center gap-12 md:gap-16">
+                
+                {/* Column 1: Title */}
+                <motion.div
+                  variants={staggerContainer}
+                  initial="hidden"
+                  animate={currentPage === actualPageIndex ? "visible" : "hidden"}
+                  className="flex-shrink-0 flex flex-col justify-start md:w-1/3 md:pr-12 md:border-r-[3px] border-[#4a0000]"
+                >
+                  <div className="overflow-hidden py-2">
+                    <motion.h3 variants={textReveal} className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-none tracking-tighter">
+                      Mis <br className="hidden md:block" />Certificados
+                      {certPagesCount > 1 && <span className="text-xl ml-2 opacity-50 block mt-2">({pageIndex + 1}/{certPagesCount})</span>}
+                    </motion.h3>
+                  </div>
+                  {pageIndex === 0 && (
+                    <motion.div variants={fadeUp} className="mt-8 space-y-4 text-sm md:text-base text-white/70 font-medium leading-relaxed">
+                      <p>
+                        A lo largo de mi carrera, me he comprometido con el aprendizaje constante para mantenerme a la vanguardia de la ciberseguridad y el desarrollo tecnológico.
+                      </p>
+                      <p>
+                        Estas certificaciones validan mi dominio de los estándares de la industria, las mejores prácticas de seguridad y mi competencia en soluciones clave.
+                      </p>
+                    </motion.div>
+                  )}
+                </motion.div>
+                
+                {/* Column 2: Certificates Grid */}
+                <motion.div
+                  variants={staggerContainer}
+                  initial="hidden"
+                  animate={currentPage === actualPageIndex ? "visible" : "hidden"}
+                  className="flex-1 flex flex-col justify-center w-full"
+                >
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6 md:gap-8 w-full">
+                    {certsForPage.map((cert) => (
+                      <motion.a 
+                        href={cert.certificate_url || "#"}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        key={cert.id_certificate} 
+                        variants={fadeUp} 
+                        className="relative group bg-[#1a1a1a] rounded-lg overflow-hidden shadow-lg border border-white/10 hover:border-[#990000]/50 transition-colors duration-300 block"
+                      >
+                        <div className="aspect-square w-full relative bg-[#0a0a0a] overflow-hidden">
+                          <img 
+                            src={cert.certificate_logo} 
+                            alt={cert.name} 
+                            className="absolute inset-0 w-full h-full object-contain p-2 sm:p-4 opacity-80 group-hover:opacity-100 transition-all duration-500 group-hover:scale-105"
+                            referrerPolicy="no-referrer"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent pointer-events-none" />
+                          <div className="absolute bottom-0 left-0 w-full p-4 sm:p-5 z-10 flex flex-col justify-end">
+                            <div className="text-[0.6rem] sm:text-xs font-bold tracking-widest text-[#990000] mb-1 drop-shadow-md leading-tight line-clamp-1">
+                              {cert.certificate_issuer}
+                            </div>
+                            <div className="text-sm sm:text-base font-bold leading-tight text-white drop-shadow-lg line-clamp-2" title={cert.name}>
+                              {cert.name}
+                            </div>
+                          </div>
+                        </div>
+                        <div className="w-full py-2.5 sm:py-3 bg-[#111111] border-t border-white/5 flex justify-center items-center">
+                          <span className="text-[0.6rem] sm:text-[0.7rem] text-gray-400 font-medium tracking-wide">
+                            {cert.date_completion ? new Date(cert.date_completion).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' }) : "Reciente"}
+                          </span>
+                        </div>
+                      </motion.a>
+                    ))}
+                  </div>
+                </motion.div>
+              </div>
+            </section>
+          );
+        })}
 
         {/* Final Page: CV (Image 3) */}
         <section className="w-screen h-screen overflow-y-auto no-scrollbar flex-shrink-0 flex items-start md:items-center justify-center px-6 sm:px-16 md:px-32 relative py-24 md:py-0">
