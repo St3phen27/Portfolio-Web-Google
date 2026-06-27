@@ -436,13 +436,13 @@ export default function App() {
     initializeApp();
   }, []);
 
-  // Handle scroll and touch for horizontal page navigation
+  // Handle scroll and touch for horizontal/vertical page navigation
   const touchStartX = useRef(0);
   const touchEndX = useRef(0);
+  const touchStartY = useRef(0);
+  const touchEndY = useRef(0);
 
   useEffect(() => {
-    if (isMobile) return;
-
     const scrollToDirection = (direction: number) => {
       const nextPage = Math.max(0, Math.min(totalPages - 1, currentPage + direction));
       if (nextPage !== currentPage) {
@@ -450,7 +450,7 @@ export default function App() {
         setCurrentPage(nextPage);
         setTimeout(() => {
           isScrolling.current = false;
-        }, 1250); 
+        }, isMobile ? 800 : 1250); 
       }
     };
 
@@ -458,30 +458,47 @@ export default function App() {
       e.preventDefault();
       if (isScrolling.current) return;
 
-      // Threshold to ignore tiny trackpad movements
-      if (Math.abs(e.deltaY) < 20) return;
-
-      // Determine direction: down -> forward, up -> backward
-      const direction = e.deltaY > 0 ? 1 : -1;
-      scrollToDirection(direction);
+      if (isMobile) {
+        if (Math.abs(e.deltaY) < 20) return;
+        const direction = e.deltaY > 0 ? 1 : -1;
+        scrollToDirection(direction);
+      } else {
+        if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
+          if (Math.abs(e.deltaX) < 20) return;
+          const direction = e.deltaX > 0 ? 1 : -1;
+          scrollToDirection(direction);
+        } else {
+          if (Math.abs(e.deltaY) < 20) return;
+          const direction = e.deltaY > 0 ? 1 : -1;
+          scrollToDirection(direction);
+        }
+      }
     };
 
     const handleTouchStart = (e: TouchEvent) => {
       touchStartX.current = e.changedTouches[0].screenX;
+      touchStartY.current = e.changedTouches[0].screenY;
     };
 
     const handleTouchEnd = (e: TouchEvent) => {
       touchEndX.current = e.changedTouches[0].screenX;
+      touchEndY.current = e.changedTouches[0].screenY;
       if (isScrolling.current) return;
       
       const swipeThreshold = 50;
-      if (touchEndX.current < touchStartX.current - swipeThreshold) {
-        // swipe left -> forward
-        scrollToDirection(1);
-      }
-      if (touchEndX.current > touchStartX.current + swipeThreshold) {
-        // swipe right -> backward
-        scrollToDirection(-1);
+      
+      if (isMobile) {
+        if (touchStartY.current - touchEndY.current > swipeThreshold) {
+          scrollToDirection(1);
+        } else if (touchEndY.current - touchStartY.current > swipeThreshold) {
+          scrollToDirection(-1);
+        }
+      } else {
+        if (touchStartX.current - touchEndX.current > swipeThreshold) {
+          scrollToDirection(1);
+        } else if (touchEndX.current - touchStartX.current > swipeThreshold) {
+          scrollToDirection(-1);
+        }
       }
     };
 
@@ -592,7 +609,7 @@ export default function App() {
         )}
       </AnimatePresence>
 
-      <main className="fixed inset-0 w-screen h-screen md:overflow-hidden overflow-y-auto overflow-x-hidden bg-[#05070a] text-white selection:bg-brand-red/30">
+      <main className="fixed inset-0 w-screen h-screen overflow-hidden bg-[#05070a] text-white selection:bg-brand-red/30">
       {/* Global Dynamic Geometric Background */}
       <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
         {backgroundShapes.map((shape, i) => (
@@ -628,10 +645,13 @@ export default function App() {
 
       {/* Main horizontal sliding container (stacked vertically on mobile) */}
       <motion.div
-        className="flex flex-col md:flex-row md:h-full relative z-10"
-        style={{ width: isMobile ? "100%" : `${(5 + certPagesCount) * 100}vw` }}
-        animate={isMobile ? { x: 0 } : { 
-          x: `-${
+        className="flex flex-col md:flex-row h-full relative z-10"
+        style={{ 
+          width: isMobile ? "100%" : `${(5 + certPagesCount) * 100}vw`,
+          height: isMobile ? `${totalPages * 100}vh` : "100%"
+        }}
+        animate={{ 
+          x: isMobile ? 0 : `-${
             currentPage < 3 
               ? currentPage * 100 
               : isProjectPage 
@@ -639,18 +659,17 @@ export default function App() {
                 : isCertPage
                   ? 400 + (currentPage - (3 + projectPagesCount)) * 100
                   : 400 + certPagesCount * 100
-          }vw` 
+          }vw`,
+          y: isMobile ? `-${currentPage * 100}vh` : 0
         }}
-        transition={isMobile ? { duration: 0 } : { duration: 1.25, ease: APPLE_EASE }}
+        transition={{ duration: isMobile ? 0.7 : 1.25, ease: APPLE_EASE }}
       >
         {/* Page 1: Intro (Image 6) */}
         <section className="w-full md:w-screen min-h-screen md:h-screen overflow-hidden md:overflow-y-auto no-scrollbar flex-shrink-0 flex flex-col justify-center px-6 sm:px-16 md:px-32 relative py-24 md:py-0">
           <motion.div
             variants={staggerContainer}
             initial="hidden"
-            animate={isMobile ? undefined : (currentPage === 0 ? "visible" : "hidden")}
-            whileInView={isMobile ? "visible" : undefined}
-            viewport={{ once: false, amount: 0.3 }}
+            animate={currentPage === 0 ? "visible" : "hidden"}
             className="space-y-0"
           >
             <div className="overflow-hidden py-2">
@@ -667,9 +686,7 @@ export default function App() {
           
           <motion.div 
             initial={{ scaleX: 0, opacity: 0 }}
-            animate={isMobile ? undefined : (currentPage === 0 ? { scaleX: 1, opacity: 1 } : { scaleX: 0, opacity: 0 })}
-            whileInView={isMobile ? { scaleX: 1, opacity: 1 } : undefined}
-            viewport={{ once: false, amount: 0.3 }}
+            animate={currentPage === 0 ? { scaleX: 1, opacity: 1 } : { scaleX: 0, opacity: 0 }}
             transition={{ duration: 1.5, ease: APPLE_EASE, delay: 0.75 }}
             style={{ originX: 0 }}
             className="absolute bottom-16 left-16 md:left-32 right-16 md:right-32"
@@ -696,38 +713,32 @@ export default function App() {
           <motion.div
             variants={staggerContainer}
             initial="hidden"
-            animate={isMobile ? undefined : (currentPage === 1 ? "visible" : "hidden")}
-            whileInView={isMobile ? "visible" : undefined}
-            viewport={{ once: false, amount: 0.3 }}
-            className="space-y-2 mt-20 md:mt-20"
+            animate={currentPage === 1 ? "visible" : "hidden"}
+            className="space-y-2 md:space-y-4 mt-20 md:mt-20 w-full"
           >
-            <div className="overflow-hidden flex">
-              <InteractiveWord text="NO LLORES PORQUE" className="text-3xl sm:text-5xl md:text-7xl lg:text-[4rem] font-bold tracking-tighter leading-none" />
+            <div className="overflow-hidden flex w-full">
+              <InteractiveWord text="NO LLORES PORQUE" className="text-[2.2rem] sm:text-5xl md:text-7xl lg:text-[4rem] font-bold tracking-tighter leading-[0.9] w-full break-words" />
             </div>
-            <div className="overflow-hidden ml-8 sm:ml-24 md:ml-48 flex">
-              <InteractiveWord text="TERMINÓ, SONRIE" className="text-4xl sm:text-6xl md:text-7xl lg:text-[8rem] font-bold tracking-tighter leading-none" />
+            <div className="overflow-hidden sm:ml-24 md:ml-48 flex w-full">
+              <InteractiveWord text="TERMINÓ, SONRIE" className="text-[2.8rem] sm:text-6xl md:text-7xl lg:text-[8rem] font-bold tracking-tighter leading-[0.9] w-full break-words" />
             </div>
-            <div className="overflow-hidden flex">
-              <InteractiveWord text="PORQUE SUCEDIÓ" className="text-4xl sm:text-7xl md:text-[9rem] lg:text-[12rem] font-bold tracking-tighter leading-none" />
+            <div className="overflow-hidden flex w-full">
+              <InteractiveWord text="PORQUE SUCEDIÓ" className="text-[3.2rem] sm:text-7xl md:text-[9rem] lg:text-[12rem] font-bold tracking-tighter leading-[0.9] text-[#990000] w-full break-words" />
             </div>
           </motion.div>
           <motion.div 
             variants={fadeUp}
             initial="hidden"
-            animate={isMobile ? undefined : (currentPage === 1 ? "visible" : "hidden")}
-            whileInView={isMobile ? "visible" : undefined}
-            viewport={{ once: false, amount: 0.3 }}
+            animate={currentPage === 1 ? "visible" : "hidden"}
             className="absolute bottom-32 sm:bottom-24 right-8 sm:right-16 md:right-32 text-right"
           >
             <p className="text-xl font-bold opacity-80">Dr. Seuss / 1980` ~`</p>
             <motion.div 
               initial={{ scaleX: 0 }}
-              animate={isMobile ? undefined : (currentPage === 1 ? { scaleX: 1 } : { scaleX: 0 })}
-              whileInView={isMobile ? { scaleX: 1 } : undefined}
-              viewport={{ once: false, amount: 0.3 }}
+              animate={currentPage === 1 ? { scaleX: 1 } : { scaleX: 0 }}
               transition={{ duration: 1.25, ease: APPLE_EASE, delay: 1.0 }}
               style={{ originX: 1 }}
-              className="h-[1px] bg-[#4a0000] w-64 mt-4" 
+              className="h-[1px] bg-[#4a0000] w-64 mt-4 ml-auto" 
             />
           </motion.div>
         </section>
@@ -740,9 +751,7 @@ export default function App() {
             <motion.div
               variants={staggerContainer}
               initial="hidden"
-              animate={isMobile ? undefined : (currentPage === 2 ? "visible" : "hidden")}
-              whileInView={isMobile ? "visible" : undefined}
-              viewport={{ once: false, amount: 0.3 }}
+              animate={currentPage === 2 ? "visible" : "hidden"}
               className="flex-1 flex flex-col justify-start md:pr-12 md:border-r-[3px] border-[#4a0000] py-4 md:py-0"
             >
               <div className="overflow-hidden py-2">
@@ -805,70 +814,72 @@ export default function App() {
 
         {/* Dynamic Project Pages */}
         {isMobile ? (
-          projects.map((project) => (
-            <section key={project.id_proyect} className="w-full min-h-screen h-screen overflow-hidden relative cursor-pointer group" onClick={() => window.open(project.url, "_blank")}>
-              {/* Background Graphic / Photo */}
-              <div className="absolute inset-0 pointer-events-none">
-                <img 
-                  src={project.bg_photo || "https://picsum.photos/seed/portfolio/1920/1080"} 
-                  alt={project.name}
-                  className="w-full h-full object-cover opacity-50 transition-opacity duration-700 group-hover:opacity-40"
-                  referrerPolicy="no-referrer"
-                />
-                <div className="absolute inset-0 bg-black/50" />
-                
-                {!project.bg_photo && (
-                  <>
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[70%] h-[50%] border border-white/30 rounded-lg">
-                      <div className="flex gap-2 p-4 border-b border-white/30">
-                          <div className="w-2 h-2 rounded-full bg-white/30" />
-                          <div className="w-2 h-2 rounded-full bg-white/30" />
-                          <div className="w-2 h-2 rounded-full bg-white/30" />
+          projects.map((project, index) => {
+            const pageIndex = 3 + index;
+            return (
+              <section key={project.id_proyect} className="w-full min-h-screen h-screen overflow-hidden relative cursor-pointer group" onClick={() => window.open(project.url, "_blank")}>
+                {/* Background Graphic / Photo */}
+                <div className="absolute inset-0 pointer-events-none">
+                  <img 
+                    src={project.bg_photo || "https://picsum.photos/seed/portfolio/1920/1080"} 
+                    alt={project.name}
+                    className="w-full h-full object-cover opacity-50 transition-opacity duration-700 group-hover:opacity-40"
+                    referrerPolicy="no-referrer"
+                  />
+                  <div className="absolute inset-0 bg-black/50" />
+                  
+                  {!project.bg_photo && (
+                    <>
+                      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[70%] h-[50%] border border-white/30 rounded-lg">
+                        <div className="flex gap-2 p-4 border-b border-white/30">
+                            <div className="w-2 h-2 rounded-full bg-white/30" />
+                            <div className="w-2 h-2 rounded-full bg-white/30" />
+                            <div className="w-2 h-2 rounded-full bg-white/30" />
+                        </div>
                       </div>
-                    </div>
-                    <motion.div 
-                      animate={{ y: [0, -20, 0], rotate: [0, 5, 0] }}
-                      transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-                      className="absolute top-1/4 right-1/4 w-96 h-96 bg-purple-900/20 rounded-full blur-[6.25rem]" 
-                    />
-                    <motion.div 
-                      animate={{ y: [0, 20, 0], scale: [1, 1.1, 1] }}
-                      transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-                      className="absolute bottom-1/4 left-1/4 w-64 h-64 bg-[#990000]/10 rounded-full blur-[5rem]" 
-                    />
-                  </>
-                )}
-              </div>
-
-              <motion.div 
-                className="relative z-10 space-y-8 h-full flex flex-col justify-center px-6 sm:px-16"
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: false, amount: 0.3 }}
-                variants={{
-                  hidden: { opacity: 0, y: 20 },
-                  visible: { opacity: 1, y: 0, transition: { staggerChildren: 0.1 } }
-                }}
-              >
-                <div className="space-y-0">
-                  <div className="overflow-hidden py-2">
-                    <motion.h4 
-                      variants={textReveal}
-                      className="text-5xl sm:text-7xl font-bold tracking-tighter leading-[0.9] uppercase"
-                    >
-                      {project.name}
-                    </motion.h4>
-                  </div>
+                      <motion.div 
+                        animate={{ y: [0, -20, 0], rotate: [0, 5, 0] }}
+                        transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+                        className="absolute top-1/4 right-1/4 w-96 h-96 bg-purple-900/20 rounded-full blur-[6.25rem]" 
+                      />
+                      <motion.div 
+                        animate={{ y: [0, 20, 0], scale: [1, 1.1, 1] }}
+                        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+                        className="absolute bottom-1/4 left-1/4 w-64 h-64 bg-[#990000]/10 rounded-full blur-[5rem]" 
+                      />
+                    </>
+                  )}
                 </div>
-                <motion.div variants={fadeUp} className="space-y-4">
-                  <p className="text-xl sm:text-3xl text-[#990000] font-bold tracking-tight">{project.short_description}</p>
-                  <p className="text-base sm:text-xl text-white/50 max-w-2xl font-medium">
-                    {project.long_description}
-                  </p>
+
+                <motion.div 
+                  className="relative z-10 space-y-8 h-full flex flex-col justify-center px-6 sm:px-16"
+                  initial="hidden"
+                  animate={currentPage === pageIndex ? "visible" : "hidden"}
+                  variants={{
+                    hidden: { opacity: 0, y: 20 },
+                    visible: { opacity: 1, y: 0, transition: { staggerChildren: 0.1 } }
+                  }}
+                >
+                  <div className="space-y-0">
+                    <div className="overflow-hidden py-2">
+                      <motion.h4 
+                        variants={textReveal}
+                        className="text-5xl sm:text-7xl font-bold tracking-tighter leading-[0.9] uppercase"
+                      >
+                        {project.name}
+                      </motion.h4>
+                    </div>
+                  </div>
+                  <motion.div variants={fadeUp} className="space-y-4">
+                    <p className="text-xl sm:text-3xl text-[#990000] font-bold tracking-tight">{project.short_description}</p>
+                    <p className="text-base sm:text-xl text-white/50 max-w-2xl font-medium">
+                      {project.long_description}
+                    </p>
+                  </motion.div>
                 </motion.div>
-              </motion.div>
-            </section>
-          ))
+              </section>
+            );
+          })
         ) : (
           <section className="w-screen h-screen flex-shrink-0 relative overflow-hidden hidden md:block">
             <AnimatePresence mode="popLayout">
@@ -966,9 +977,7 @@ export default function App() {
                 <motion.div
                   variants={staggerContainer}
                   initial="hidden"
-                  animate={isMobile ? undefined : (currentPage === actualPageIndex ? "visible" : "hidden")}
-                  whileInView={isMobile ? "visible" : undefined}
-                  viewport={{ once: false, amount: 0.1 }}
+                  animate={currentPage === actualPageIndex ? "visible" : "hidden"}
                   className="flex-shrink-0 flex flex-col justify-start md:w-1/3 md:pr-12 md:border-r-[3px] border-[#4a0000]"
                 >
                   <div className="overflow-hidden py-2">
@@ -993,9 +1002,7 @@ export default function App() {
                 <motion.div
                   variants={staggerContainer}
                   initial="hidden"
-                  animate={isMobile ? undefined : (currentPage === actualPageIndex ? "visible" : "hidden")}
-                  whileInView={isMobile ? "visible" : undefined}
-                  viewport={{ once: false, amount: 0.1 }}
+                  animate={currentPage === actualPageIndex ? "visible" : "hidden"}
                   className="flex-1 flex flex-col justify-center w-full"
                 >
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6 md:gap-8 w-full">
@@ -1044,9 +1051,7 @@ export default function App() {
           <motion.div
             variants={staggerContainer}
             initial="hidden"
-            animate={isMobile ? undefined : (currentPage === totalPages - 1 ? "visible" : "hidden")}
-            whileInView={isMobile ? "visible" : undefined}
-            viewport={{ once: false, amount: 0.1 }}
+            animate={currentPage === totalPages - 1 ? "visible" : "hidden"}
             className="w-full max-w-7xl grid grid-cols-1 md:grid-cols-12 gap-12 items-center"
           >
             {/* Left Column: Contact Info */}
