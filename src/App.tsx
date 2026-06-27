@@ -455,50 +455,39 @@ export default function App() {
     };
 
     const handleWheel = (e: WheelEvent) => {
+      if (isMobile) return;
       e.preventDefault();
       if (isScrolling.current) return;
 
-      if (isMobile) {
+      if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
+        if (Math.abs(e.deltaX) < 20) return;
+        const direction = e.deltaX > 0 ? 1 : -1;
+        scrollToDirection(direction);
+      } else {
         if (Math.abs(e.deltaY) < 20) return;
         const direction = e.deltaY > 0 ? 1 : -1;
         scrollToDirection(direction);
-      } else {
-        if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
-          if (Math.abs(e.deltaX) < 20) return;
-          const direction = e.deltaX > 0 ? 1 : -1;
-          scrollToDirection(direction);
-        } else {
-          if (Math.abs(e.deltaY) < 20) return;
-          const direction = e.deltaY > 0 ? 1 : -1;
-          scrollToDirection(direction);
-        }
       }
     };
 
     const handleTouchStart = (e: TouchEvent) => {
+      if (isMobile) return;
       touchStartX.current = e.changedTouches[0].screenX;
       touchStartY.current = e.changedTouches[0].screenY;
     };
 
     const handleTouchEnd = (e: TouchEvent) => {
+      if (isMobile) return;
       touchEndX.current = e.changedTouches[0].screenX;
       touchEndY.current = e.changedTouches[0].screenY;
       if (isScrolling.current) return;
       
       const swipeThreshold = 50;
       
-      if (isMobile) {
-        if (touchStartY.current - touchEndY.current > swipeThreshold) {
-          scrollToDirection(1);
-        } else if (touchEndY.current - touchStartY.current > swipeThreshold) {
-          scrollToDirection(-1);
-        }
-      } else {
-        if (touchStartX.current - touchEndX.current > swipeThreshold) {
-          scrollToDirection(1);
-        } else if (touchEndX.current - touchStartX.current > swipeThreshold) {
-          scrollToDirection(-1);
-        }
+      if (touchStartX.current - touchEndX.current > swipeThreshold) {
+        scrollToDirection(1);
+      } else if (touchEndX.current - touchStartX.current > swipeThreshold) {
+        scrollToDirection(-1);
       }
     };
 
@@ -609,7 +598,7 @@ export default function App() {
         )}
       </AnimatePresence>
 
-      <main className="fixed inset-0 w-screen h-screen overflow-hidden bg-[#05070a] text-white selection:bg-brand-red/30">
+      <main className={`fixed inset-0 w-screen h-screen ${isMobile ? 'overflow-y-auto overflow-x-hidden' : 'overflow-hidden'} bg-[#05070a] text-white selection:bg-brand-red/30`}>
       {/* Global Dynamic Geometric Background */}
       <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
         {backgroundShapes.map((shape, i) => (
@@ -648,10 +637,10 @@ export default function App() {
         className="flex flex-col md:flex-row h-full relative z-10"
         style={{ 
           width: isMobile ? "100%" : `${(5 + certPagesCount) * 100}vw`,
-          height: isMobile ? `${totalPages * 100}vh` : "100%"
+          height: isMobile ? "auto" : "100%"
         }}
-        animate={{ 
-          x: isMobile ? 0 : `-${
+        animate={isMobile ? undefined : { 
+          x: `-${
             currentPage < 3 
               ? currentPage * 100 
               : isProjectPage 
@@ -660,16 +649,18 @@ export default function App() {
                   ? 400 + (currentPage - (3 + projectPagesCount)) * 100
                   : 400 + certPagesCount * 100
           }vw`,
-          y: isMobile ? `-${currentPage * 100}vh` : 0
+          y: 0
         }}
-        transition={{ duration: isMobile ? 0.7 : 1.25, ease: APPLE_EASE }}
+        transition={{ duration: 1.25, ease: APPLE_EASE }}
       >
         {/* Page 1: Intro (Image 6) */}
         <section className="w-full md:w-screen min-h-screen md:h-screen overflow-hidden md:overflow-y-auto no-scrollbar flex-shrink-0 flex flex-col justify-center px-6 sm:px-16 md:px-32 relative py-24 md:py-0">
           <motion.div
             variants={staggerContainer}
             initial="hidden"
-            animate={currentPage === 0 ? "visible" : "hidden"}
+            animate={isMobile ? undefined : (currentPage === 0 ? "visible" : "hidden")}
+            whileInView={isMobile ? "visible" : undefined}
+            viewport={{ once: false, amount: 0.3 }}
             className="space-y-0"
           >
             <div className="overflow-hidden py-2">
@@ -686,7 +677,9 @@ export default function App() {
           
           <motion.div 
             initial={{ scaleX: 0, opacity: 0 }}
-            animate={currentPage === 0 ? { scaleX: 1, opacity: 1 } : { scaleX: 0, opacity: 0 }}
+            animate={isMobile ? undefined : (currentPage === 0 ? { scaleX: 1, opacity: 1 } : { scaleX: 0, opacity: 0 })}
+            whileInView={isMobile ? { scaleX: 1, opacity: 1 } : undefined}
+            viewport={{ once: false, amount: 0.3 }}
             transition={{ duration: 1.5, ease: APPLE_EASE, delay: 0.75 }}
             style={{ originX: 0 }}
             className="absolute bottom-16 left-16 md:left-32 right-16 md:right-32"
@@ -713,7 +706,9 @@ export default function App() {
           <motion.div
             variants={staggerContainer}
             initial="hidden"
-            animate={currentPage === 1 ? "visible" : "hidden"}
+            animate={isMobile ? undefined : (currentPage === 1 ? "visible" : "hidden")}
+            whileInView={isMobile ? "visible" : undefined}
+            viewport={{ once: false, amount: 0.3 }}
             className="space-y-2 md:space-y-4 mt-20 md:mt-20 w-full"
           >
             <div className="overflow-hidden flex w-full">
@@ -729,13 +724,17 @@ export default function App() {
           <motion.div 
             variants={fadeUp}
             initial="hidden"
-            animate={currentPage === 1 ? "visible" : "hidden"}
+            animate={isMobile ? undefined : (currentPage === 1 ? "visible" : "hidden")}
+            whileInView={isMobile ? "visible" : undefined}
+            viewport={{ once: false, amount: 0.3 }}
             className="absolute bottom-32 sm:bottom-24 right-8 sm:right-16 md:right-32 text-right"
           >
             <p className="text-xl font-bold opacity-80">Dr. Seuss / 1980` ~`</p>
             <motion.div 
               initial={{ scaleX: 0 }}
-              animate={currentPage === 1 ? { scaleX: 1 } : { scaleX: 0 }}
+              animate={isMobile ? undefined : (currentPage === 1 ? { scaleX: 1 } : { scaleX: 0 })}
+              whileInView={isMobile ? { scaleX: 1 } : undefined}
+              viewport={{ once: false, amount: 0.3 }}
               transition={{ duration: 1.25, ease: APPLE_EASE, delay: 1.0 }}
               style={{ originX: 1 }}
               className="h-[1px] bg-[#4a0000] w-64 mt-4 ml-auto" 
@@ -751,7 +750,9 @@ export default function App() {
             <motion.div
               variants={staggerContainer}
               initial="hidden"
-              animate={currentPage === 2 ? "visible" : "hidden"}
+              animate={isMobile ? undefined : (currentPage === 2 ? "visible" : "hidden")}
+              whileInView={isMobile ? "visible" : undefined}
+              viewport={{ once: false, amount: 0.3 }}
               className="flex-1 flex flex-col justify-start md:pr-12 md:border-r-[3px] border-[#4a0000] py-4 md:py-0"
             >
               <div className="overflow-hidden py-2">
@@ -771,7 +772,9 @@ export default function App() {
             <motion.div
               variants={staggerContainer}
               initial="hidden"
-              animate={currentPage === 2 ? "visible" : "hidden"}
+              animate={isMobile ? undefined : (currentPage === 2 ? "visible" : "hidden")}
+              whileInView={isMobile ? "visible" : undefined}
+              viewport={{ once: false, amount: 0.3 }}
               className="flex-1 flex flex-col justify-start md:px-12 md:border-r-[3px] border-[#4a0000] py-4 md:py-0"
             >
               <div className="overflow-hidden py-2">
@@ -791,7 +794,9 @@ export default function App() {
             <motion.div
               variants={staggerContainer}
               initial="hidden"
-              animate={currentPage === 2 ? "visible" : "hidden"}
+              animate={isMobile ? undefined : (currentPage === 2 ? "visible" : "hidden")}
+              whileInView={isMobile ? "visible" : undefined}
+              viewport={{ once: false, amount: 0.3 }}
               className="flex-1 flex flex-col justify-start md:pl-12 py-4 md:py-0"
             >
               <div className="overflow-hidden py-2">
@@ -854,7 +859,9 @@ export default function App() {
                 <motion.div 
                   className="relative z-10 space-y-8 h-full flex flex-col justify-center px-6 sm:px-16"
                   initial="hidden"
-                  animate={currentPage === pageIndex ? "visible" : "hidden"}
+                  animate={isMobile ? undefined : (currentPage === pageIndex ? "visible" : "hidden")}
+                  whileInView={isMobile ? "visible" : undefined}
+                  viewport={{ once: false, amount: 0.3 }}
                   variants={{
                     hidden: { opacity: 0, y: 20 },
                     visible: { opacity: 1, y: 0, transition: { staggerChildren: 0.1 } }
@@ -977,7 +984,9 @@ export default function App() {
                 <motion.div
                   variants={staggerContainer}
                   initial="hidden"
-                  animate={currentPage === actualPageIndex ? "visible" : "hidden"}
+                  animate={isMobile ? undefined : (currentPage === actualPageIndex ? "visible" : "hidden")}
+                  whileInView={isMobile ? "visible" : undefined}
+                  viewport={{ once: false, amount: 0.1 }}
                   className="flex-shrink-0 flex flex-col justify-start md:w-1/3 md:pr-12 md:border-r-[3px] border-[#4a0000]"
                 >
                   <div className="overflow-hidden py-2">
@@ -1002,7 +1011,9 @@ export default function App() {
                 <motion.div
                   variants={staggerContainer}
                   initial="hidden"
-                  animate={currentPage === actualPageIndex ? "visible" : "hidden"}
+                  animate={isMobile ? undefined : (currentPage === actualPageIndex ? "visible" : "hidden")}
+                  whileInView={isMobile ? "visible" : undefined}
+                  viewport={{ once: false, amount: 0.1 }}
                   className="flex-1 flex flex-col justify-center w-full"
                 >
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6 md:gap-8 w-full">
@@ -1051,7 +1062,9 @@ export default function App() {
           <motion.div
             variants={staggerContainer}
             initial="hidden"
-            animate={currentPage === totalPages - 1 ? "visible" : "hidden"}
+            animate={isMobile ? undefined : (currentPage === totalPages - 1 ? "visible" : "hidden")}
+            whileInView={isMobile ? "visible" : undefined}
+            viewport={{ once: false, amount: 0.1 }}
             className="w-full max-w-7xl grid grid-cols-1 md:grid-cols-12 gap-12 items-center"
           >
             {/* Left Column: Contact Info */}
