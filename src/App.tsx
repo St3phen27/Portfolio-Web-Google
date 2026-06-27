@@ -3,6 +3,7 @@ import { motion, AnimatePresence, useMotionValue, useSpring } from "motion/react
 import { ArrowRight, ArrowDown, Github, Linkedin, Instagram, FileText, Printer } from "lucide-react";
 import { useRef, useEffect, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
+import { RevealMotionDiv } from "./components/RevealMotionDiv";
 
 // Custom Home Icon to match the image
 const HomeIcon = () => (
@@ -655,12 +656,12 @@ export default function App() {
       >
         {/* Page 1: Intro (Image 6) */}
         <section className="w-full md:w-screen min-h-screen md:h-screen overflow-hidden md:overflow-y-auto no-scrollbar flex-shrink-0 flex flex-col justify-center px-6 sm:px-16 md:px-32 relative py-24 md:py-0">
-          <motion.div
+          <RevealMotionDiv
             variants={staggerContainer}
             initial="hidden"
-            animate={isMobile ? undefined : (currentPage === 0 ? "visible" : "hidden")}
-            whileInView={isMobile ? "visible" : undefined}
-            viewport={{ once: false, amount: 0.3 }}
+            isMobile={isMobile}
+            activeCondition={currentPage === 0}
+            amount={0.3}
             className="space-y-0"
           >
             <div className="overflow-hidden py-2">
@@ -673,13 +674,14 @@ export default function App() {
               <span>Ingeniero en Sistemas</span>
               <span>Especialista en Seguridad Informática</span>
             </motion.div>
-          </motion.div>
+          </RevealMotionDiv>
           
-          <motion.div 
+          <RevealMotionDiv 
             initial={{ scaleX: 0, opacity: 0 }}
-            animate={isMobile ? undefined : (currentPage === 0 ? { scaleX: 1, opacity: 1 } : { scaleX: 0, opacity: 0 })}
-            whileInView={isMobile ? { scaleX: 1, opacity: 1 } : undefined}
-            viewport={{ once: false, amount: 0.3 }}
+            isMobile={isMobile}
+            activeCondition={currentPage === 0 ? { scaleX: 1, opacity: 1 } : { scaleX: 0, opacity: 0 }}
+            mobileAnimateState={{ scaleX: 1, opacity: 1 }}
+            amount={0.3}
             transition={{ duration: 1.5, ease: APPLE_EASE, delay: 0.75 }}
             style={{ originX: 0 }}
             className="absolute bottom-16 left-16 md:left-32 right-16 md:right-32"
@@ -697,18 +699,18 @@ export default function App() {
                   )}
                 </motion.div>
              </div>
-          </motion.div>
+          </RevealMotionDiv>
         </section>
 
         {/* Page 2: Phrase (Image 5) */}
         {/*rem Generar impacto para la frase, puede ir en escalada*/}
         <section className="w-full md:w-screen min-h-screen md:h-screen overflow-hidden md:overflow-y-auto no-scrollbar flex-shrink-0 flex flex-col justify-center px-6 sm:px-16 md:px-32 relative py-24 md:py-0">
-          <motion.div
+          <RevealMotionDiv
             variants={staggerContainer}
             initial="hidden"
-            animate={isMobile ? undefined : (currentPage === 1 ? "visible" : "hidden")}
-            whileInView={isMobile ? "visible" : undefined}
-            viewport={{ once: false, amount: 0.3 }}
+            isMobile={isMobile}
+            activeCondition={currentPage === 1}
+            amount={0.3}
             className="space-y-2 md:space-y-4 mt-20 md:mt-20 w-full"
           >
             <div className="overflow-hidden flex w-full">
@@ -720,45 +722,46 @@ export default function App() {
             <div className="overflow-hidden flex w-full">
               <InteractiveWord text="PORQUE SUCEDIÓ" className="text-[3.2rem] sm:text-7xl md:text-[9rem] lg:text-[12rem] font-bold tracking-tighter leading-[0.9] text-[#990000] w-full break-words" />
             </div>
-          </motion.div>
-          <motion.div 
+          </RevealMotionDiv>
+          <RevealMotionDiv 
             variants={fadeUp}
             initial="hidden"
-            animate={isMobile ? undefined : (currentPage === 1 ? "visible" : "hidden")}
-            whileInView={isMobile ? "visible" : undefined}
-            viewport={{ once: false, amount: 0.3 }}
+            isMobile={isMobile}
+            activeCondition={currentPage === 1}
+            amount={0.3}
             className="absolute bottom-32 sm:bottom-24 right-8 sm:right-16 md:right-32 text-right"
           >
             <p className="text-xl font-bold opacity-80">Dr. Seuss / 1980` ~`</p>
-            <motion.div 
+            <RevealMotionDiv 
               initial={{ scaleX: 0 }}
-              animate={isMobile ? undefined : (currentPage === 1 ? { scaleX: 1 } : { scaleX: 0 })}
-              whileInView={isMobile ? { scaleX: 1 } : undefined}
-              viewport={{ once: false, amount: 0.3 }}
+              isMobile={isMobile}
+              activeCondition={currentPage === 1 ? { scaleX: 1 } : { scaleX: 0 }}
+              mobileAnimateState={{ scaleX: 1 }}
+              amount={0.3}
               transition={{ duration: 1.25, ease: APPLE_EASE, delay: 1.0 }}
               style={{ originX: 1 }}
               className="h-[1px] bg-[#4a0000] w-64 mt-4 ml-auto" 
             />
-          </motion.div>
+          </RevealMotionDiv>
         </section>
 
         {/* Page 3: About (Image 1) */}
-        <section className="w-full md:w-screen min-h-screen md:h-screen overflow-hidden md:overflow-y-auto no-scrollbar flex-shrink-0 flex items-start md:items-center px-6 sm:px-16 md:px-32 relative py-24 md:py-0">
-          <div className="flex flex-col md:flex-row w-full items-stretch justify-center gap-8 md:gap-0">
+        <section className="w-full md:w-screen min-h-screen md:h-screen overflow-hidden md:overflow-y-auto no-scrollbar flex-shrink-0 flex items-start md:items-center px-6 sm:px-16 md:px-32 relative py-12 md:py-0">
+          <div className="flex flex-col md:flex-row w-full items-stretch justify-center gap-6 md:gap-0">
             
             {/* Column 1 */}
-            <motion.div
+            <RevealMotionDiv
               variants={staggerContainer}
               initial="hidden"
-              animate={isMobile ? undefined : (currentPage === 2 ? "visible" : "hidden")}
-              whileInView={isMobile ? "visible" : undefined}
-              viewport={{ once: false, amount: 0.3 }}
+              isMobile={isMobile}
+              activeCondition={currentPage === 2}
+              amount={0.3}
               className="flex-1 flex flex-col justify-start md:pr-12 md:border-r-[3px] border-[#4a0000] py-4 md:py-0"
             >
               <div className="overflow-hidden py-2">
-                <motion.h3 variants={textReveal} className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-none tracking-tighter">¿Quién<br className="hidden md:block" />soy?</motion.h3>
+                <motion.h3 variants={textReveal} className="text-3xl sm:text-5xl lg:text-6xl font-bold leading-none tracking-tighter">¿Quién<br className="hidden md:block" />soy?</motion.h3>
               </div>
-              <motion.div variants={fadeUp} className="mt-8 space-y-4 text-sm md:text-base text-white/70 font-medium leading-relaxed">
+              <motion.div variants={fadeUp} className="mt-4 md:mt-8 space-y-4 text-sm md:text-base text-white/70 font-medium leading-relaxed">
                 <p>
                   Soy <strong className="text-white">Esteban Erazo Narváez</strong>, un apasionado de la tecnología y estudiante de noveno semestre de Ingeniería de Sistemas en la Universidad CESMAG. Mi perfil combina una sólida base técnica en desarrollo de software empresarial con el framework <strong className="text-white">.NET</strong> y la administración de bases de datos relacionales.
                 </p>
@@ -766,21 +769,21 @@ export default function App() {
                   Cuento con un nivel de inglés certificado <strong className="text-white">C1.2 (IELTS)</strong>, lo que me permite desempeñarme eficazmente en entornos técnicos bilingües. Además de mi formación académica, poseo experiencia en liderazgo y comunicación asertiva, habilidades que aplico tanto en el desarrollo de soluciones tecnológicas como en la gestión de proyectos y atención al cliente.
                 </p>
               </motion.div>
-            </motion.div>
+            </RevealMotionDiv>
             
             {/* Column 2 */}
-            <motion.div
+            <RevealMotionDiv
               variants={staggerContainer}
               initial="hidden"
-              animate={isMobile ? undefined : (currentPage === 2 ? "visible" : "hidden")}
-              whileInView={isMobile ? "visible" : undefined}
-              viewport={{ once: false, amount: 0.3 }}
+              isMobile={isMobile}
+              activeCondition={currentPage === 2}
+              amount={0.3}
               className="flex-1 flex flex-col justify-start md:px-12 md:border-r-[3px] border-[#4a0000] py-4 md:py-0"
             >
               <div className="overflow-hidden py-2">
-                <motion.h3 variants={textReveal} className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-none tracking-tighter">¿Qué es lo<br className="hidden md:block" />que me motiva?</motion.h3>
+                <motion.h3 variants={textReveal} className="text-3xl sm:text-5xl lg:text-6xl font-bold leading-none tracking-tighter">¿Qué es lo<br className="hidden md:block" />que me motiva?</motion.h3>
               </div>
-              <motion.div variants={fadeUp} className="mt-8 space-y-4 text-sm md:text-base text-white/70 font-medium leading-relaxed">
+              <motion.div variants={fadeUp} className="mt-4 md:mt-8 space-y-4 text-sm md:text-base text-white/70 font-medium leading-relaxed">
                 <p>
                   Lo que me impulsa es la capacidad de transformar problemas complejos en soluciones funcionales y eficientes a través del código. Me motiva el aprendizaje continuo y la aplicación de nuevas tecnologías para optimizar procesos empresariales, garantizando siempre la calidad y la seguridad de la información.
                 </p>
@@ -788,21 +791,21 @@ export default function App() {
                   Busco constantemente retos que me permitan integrar mis habilidades técnicas con mi capacidad de liderazgo, con el objetivo de contribuir al crecimiento de organizaciones innovadoras y seguir evolucionando profesionalmente en el ciclo completo de desarrollo de aplicaciones.
                 </p>
               </motion.div>
-            </motion.div>
+            </RevealMotionDiv>
 
             {/* Column 3 */}
-            <motion.div
+            <RevealMotionDiv
               variants={staggerContainer}
               initial="hidden"
-              animate={isMobile ? undefined : (currentPage === 2 ? "visible" : "hidden")}
-              whileInView={isMobile ? "visible" : undefined}
-              viewport={{ once: false, amount: 0.3 }}
+              isMobile={isMobile}
+              activeCondition={currentPage === 2}
+              amount={0.3}
               className="flex-1 flex flex-col justify-start md:pl-12 py-4 md:py-0"
             >
               <div className="overflow-hidden py-2">
-                <motion.h3 variants={textReveal} className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-none tracking-tighter">Mis <br className="hidden md:block" />Habilidades</motion.h3>
+                <motion.h3 variants={textReveal} className="text-3xl sm:text-5xl lg:text-6xl font-bold leading-none tracking-tighter">Mis <br className="hidden md:block" />Habilidades</motion.h3>
               </div>
-              <motion.div variants={fadeUp} className="mt-8 flex flex-wrap gap-3">
+              <motion.div variants={fadeUp} className="mt-4 md:mt-8 flex flex-wrap gap-2 md:gap-3">
                 {skills.map((skill, i) => (
                   <div 
                     key={i}
@@ -812,7 +815,7 @@ export default function App() {
                   </div>
                 ))}
               </motion.div>
-            </motion.div>
+            </RevealMotionDiv>
 
           </div>
         </section>
@@ -856,12 +859,12 @@ export default function App() {
                   )}
                 </div>
 
-                <motion.div 
+                <RevealMotionDiv 
                   className="relative z-10 space-y-8 h-full flex flex-col justify-center px-6 sm:px-16"
                   initial="hidden"
-                  animate={isMobile ? undefined : (currentPage === pageIndex ? "visible" : "hidden")}
-                  whileInView={isMobile ? "visible" : undefined}
-                  viewport={{ once: false, amount: 0.3 }}
+                  isMobile={isMobile}
+                  activeCondition={currentPage === pageIndex}
+                  amount={0.3}
                   variants={{
                     hidden: { opacity: 0, y: 20 },
                     visible: { opacity: 1, y: 0, transition: { staggerChildren: 0.1 } }
@@ -883,7 +886,7 @@ export default function App() {
                       {project.long_description}
                     </p>
                   </motion.div>
-                </motion.div>
+                </RevealMotionDiv>
               </section>
             );
           })
@@ -977,26 +980,26 @@ export default function App() {
           const actualPageIndex = 3 + projectPagesCount + pageIndex;
 
           return (
-            <section key={pageIndex} className="w-full md:w-screen min-h-screen md:h-screen overflow-hidden md:overflow-y-auto no-scrollbar flex-shrink-0 flex items-start md:items-center px-6 sm:px-16 md:px-32 relative py-24 md:py-0">
-              <div className="flex flex-col md:flex-row w-full max-w-7xl mx-auto items-stretch justify-center gap-12 md:gap-16">
+            <section key={pageIndex} className="w-full md:w-screen min-h-screen md:h-screen overflow-hidden md:overflow-y-auto no-scrollbar flex-shrink-0 flex items-start md:items-center px-6 sm:px-16 md:px-32 relative py-12 md:py-0">
+              <div className="flex flex-col md:flex-row w-full max-w-7xl mx-auto items-stretch justify-center gap-8 md:gap-16">
                 
                 {/* Column 1: Title */}
-                <motion.div
+                <RevealMotionDiv
                   variants={staggerContainer}
                   initial="hidden"
-                  animate={isMobile ? undefined : (currentPage === actualPageIndex ? "visible" : "hidden")}
-                  whileInView={isMobile ? "visible" : undefined}
-                  viewport={{ once: false, amount: 0.1 }}
+                  isMobile={isMobile}
+                  activeCondition={currentPage === actualPageIndex}
+                  amount={0.1}
                   className="flex-shrink-0 flex flex-col justify-start md:w-1/3 md:pr-12 md:border-r-[3px] border-[#4a0000]"
                 >
                   <div className="overflow-hidden py-2">
-                    <motion.h3 variants={textReveal} className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-none tracking-tighter">
+                    <motion.h3 variants={textReveal} className="text-3xl sm:text-5xl lg:text-6xl font-bold leading-none tracking-tighter">
                       Mis <br className="hidden md:block" />Certificados
                       {certPagesCount > 1 && <span className="text-xl ml-2 opacity-50 block mt-2">({pageIndex + 1}/{certPagesCount})</span>}
                     </motion.h3>
                   </div>
                   {pageIndex === 0 && (
-                    <motion.div variants={fadeUp} className="mt-8 space-y-4 text-sm md:text-base text-white/70 font-medium leading-relaxed">
+                    <motion.div variants={fadeUp} className="mt-4 md:mt-8 space-y-4 text-sm md:text-base text-white/70 font-medium leading-relaxed">
                       <p>
                         A lo largo de mi carrera, me he comprometido con el aprendizaje constante para mantenerme a la vanguardia de la ciberseguridad y el desarrollo tecnológico.
                       </p>
@@ -1005,18 +1008,18 @@ export default function App() {
                       </p>
                     </motion.div>
                   )}
-                </motion.div>
+                </RevealMotionDiv>
                 
                 {/* Column 2: Certificates Grid */}
-                <motion.div
+                <RevealMotionDiv
                   variants={staggerContainer}
                   initial="hidden"
-                  animate={isMobile ? undefined : (currentPage === actualPageIndex ? "visible" : "hidden")}
-                  whileInView={isMobile ? "visible" : undefined}
-                  viewport={{ once: false, amount: 0.1 }}
+                  isMobile={isMobile}
+                  activeCondition={currentPage === actualPageIndex}
+                  amount={0.1}
                   className="flex-1 flex flex-col justify-center w-full"
                 >
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6 md:gap-8 w-full">
+                  <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-3 md:gap-8 w-full">
                     {certsForPage.map((cert) => (
                       <motion.a 
                         href={cert.certificate_url || "#"}
@@ -1051,7 +1054,7 @@ export default function App() {
                       </motion.a>
                     ))}
                   </div>
-                </motion.div>
+                </RevealMotionDiv>
               </div>
             </section>
           );
@@ -1059,12 +1062,12 @@ export default function App() {
 
         {/* Final Page: CV (Image 3) */}
         <section className="w-full md:w-screen min-h-screen md:h-screen overflow-hidden md:overflow-y-auto no-scrollbar flex-shrink-0 flex items-start md:items-center justify-center px-6 sm:px-16 md:px-32 relative py-24 md:py-0">
-          <motion.div
+          <RevealMotionDiv
             variants={staggerContainer}
             initial="hidden"
-            animate={isMobile ? undefined : (currentPage === totalPages - 1 ? "visible" : "hidden")}
-            whileInView={isMobile ? "visible" : undefined}
-            viewport={{ once: false, amount: 0.1 }}
+            isMobile={isMobile}
+            activeCondition={currentPage === totalPages - 1}
+            amount={0.1}
             className="w-full max-w-7xl grid grid-cols-1 md:grid-cols-12 gap-12 items-center"
           >
             {/* Left Column: Contact Info */}
@@ -1102,17 +1105,24 @@ export default function App() {
 
               <div className="space-y-4 pt-4">
                 <p className="text-sm text-white/90">Also you can find me in:</p>
-                <div className="flex justify-center gap-4">
-                  <a href="https://github.com/St3phen27" target="_blank" rel="noopener noreferrer" className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-black hover:scale-110 transition-transform">
+                <RevealMotionDiv 
+                  variants={staggerContainer}
+                  initial="hidden"
+                  isMobile={isMobile}
+                  activeCondition={true}
+                  mobileAnimateState="visible"
+                  className="flex justify-center gap-4"
+                >
+                  <motion.a variants={fadeUp} href="https://github.com/St3phen27" target="_blank" rel="noopener noreferrer" className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-black hover:scale-110 transition-transform">
                     <Github className="w-7 h-7" />
-                  </a>
-                  <a href="https://www.linkedin.com/in/estebanerazonarvaez/" target="_blank" rel="noopener noreferrer" className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-black hover:scale-110 transition-transform">
+                  </motion.a>
+                  <motion.a variants={fadeUp} href="https://www.linkedin.com/in/estebanerazonarvaez/" target="_blank" rel="noopener noreferrer" className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-black hover:scale-110 transition-transform">
                     <Linkedin className="w-7 h-7" />
-                  </a>
-                  <a href="https://www.instagram.com/narvaezest_/" target="_blank" rel="noopener noreferrer" className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-black hover:scale-110 transition-transform">
+                  </motion.a>
+                  <motion.a variants={fadeUp} href="https://www.instagram.com/narvaezest_/" target="_blank" rel="noopener noreferrer" className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-black hover:scale-110 transition-transform">
                     <Instagram className="w-7 h-7" />
-                  </a>
-                </div>
+                  </motion.a>
+                </RevealMotionDiv>
               </div>
             </motion.div>
 
@@ -1157,7 +1167,7 @@ export default function App() {
                 </div>
               </div>
             </motion.div>
-          </motion.div>
+          </RevealMotionDiv>
 
           {/* Footer Text */}
           <motion.div 
