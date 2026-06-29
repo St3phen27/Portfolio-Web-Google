@@ -691,7 +691,12 @@ export default function App() {
         transition={{ duration: 1.25, ease: APPLE_EASE }}
       >
         {/* Page 1: Intro (Image 6) */}
-        <section className="w-full md:w-screen min-h-screen md:h-screen overflow-hidden md:overflow-y-auto no-scrollbar flex-shrink-0 flex flex-col justify-center px-6 sm:px-16 md:px-32 relative py-24 md:py-0">
+        <motion.section 
+          initial={isMobile ? { opacity: 0, y: 50 } : false}
+          whileInView={isMobile ? { opacity: 1, y: 0 } : false}
+          viewport={{ once: false, amount: 0.1 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="w-full md:w-screen min-h-screen md:h-screen overflow-hidden md:overflow-y-auto no-scrollbar flex-shrink-0 flex flex-col justify-center px-6 sm:px-16 md:px-32 relative py-24 md:py-0">
           <RevealMotionDiv
             variants={staggerContainer}
             initial="hidden"
@@ -736,11 +741,16 @@ export default function App() {
                 </motion.div>
              </div>
           </RevealMotionDiv>
-        </section>
+        </motion.section>
 
         {/* Page 2: Phrase (Image 5) */}
         {/*rem Generar impacto para la frase, puede ir en escalada*/}
-        <section className="w-full md:w-screen min-h-screen md:h-screen overflow-hidden md:overflow-y-auto no-scrollbar flex-shrink-0 flex flex-col justify-center px-6 sm:px-16 md:px-32 relative py-24 md:py-0">
+        <motion.section 
+          initial={isMobile ? { opacity: 0, y: 50 } : false}
+          whileInView={isMobile ? { opacity: 1, y: 0 } : false}
+          viewport={{ once: false, amount: 0.1 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="w-full md:w-screen min-h-screen md:h-screen overflow-hidden md:overflow-y-auto no-scrollbar flex-shrink-0 flex flex-col justify-center px-6 sm:px-16 md:px-32 relative py-24 md:py-0">
           <RevealMotionDiv
             variants={staggerContainer}
             initial="hidden"
@@ -779,10 +789,15 @@ export default function App() {
               className="h-[1px] bg-[#4a0000] w-64 mt-4 ml-auto" 
             />
           </RevealMotionDiv>
-        </section>
+        </motion.section>
 
         {/* Page 3: About (Image 1) */}
-        <section className="w-full md:w-screen min-h-screen md:h-screen overflow-hidden md:overflow-y-auto no-scrollbar flex-shrink-0 flex items-start md:items-center px-6 sm:px-16 md:px-32 relative py-12 md:py-0">
+        <motion.section 
+          initial={isMobile ? { opacity: 0, y: 50 } : false}
+          whileInView={isMobile ? { opacity: 1, y: 0 } : false}
+          viewport={{ once: false, amount: 0.1 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="w-full md:w-screen min-h-screen md:h-screen overflow-hidden md:overflow-y-auto no-scrollbar flex-shrink-0 flex items-start md:items-center px-6 sm:px-16 md:px-32 relative py-12 md:py-0">
           <div className="flex flex-col md:flex-row w-full items-stretch justify-center gap-6 md:gap-0">
             
             {/* Column 1 */}
@@ -854,14 +869,19 @@ export default function App() {
             </RevealMotionDiv>
 
           </div>
-        </section>
+        </motion.section>
 
         {/* Dynamic Project Pages */}
         {isMobile ? (
           projects.map((project, index) => {
             const pageIndex = 3 + index;
             return (
-              <section key={project.id_proyect} className="w-full min-h-screen h-screen overflow-hidden relative cursor-pointer group" onClick={() => window.open(project.url, "_blank")}>
+              <motion.section key={project.id_proyect} 
+          initial={isMobile ? { opacity: 0, y: 50 } : false}
+          whileInView={isMobile ? { opacity: 1, y: 0 } : false}
+          viewport={{ once: false, amount: 0.1 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="w-full min-h-screen h-screen overflow-hidden relative cursor-pointer group" onClick={() => window.open(project.url, "_blank")}>
                 {/* Background Graphic / Photo */}
                 <div className="absolute inset-0">
                   <ParallaxCard className="absolute inset-0">
@@ -925,11 +945,11 @@ export default function App() {
                     </p>
                   </motion.div>
                 </RevealMotionDiv>
-              </section>
+              </motion.section>
             );
           })
         ) : (
-          <section className="w-screen h-screen flex-shrink-0 relative overflow-hidden hidden md:block">
+          <motion.section className="w-screen h-screen flex-shrink-0 relative overflow-hidden hidden md:block">
             <AnimatePresence mode="popLayout">
               {projects.map((project, index) => {
                 const pageIndex = 3 + index;
@@ -1011,7 +1031,7 @@ export default function App() {
                 );
               })}
             </AnimatePresence>
-          </section>
+          </motion.section>
         )}
 
         {/* Certifications Pages */}
@@ -1020,7 +1040,12 @@ export default function App() {
           const actualPageIndex = 3 + projectPagesCount + pageIndex;
 
           return (
-            <section key={pageIndex} className="w-full md:w-screen min-h-screen md:h-screen overflow-hidden md:overflow-y-auto no-scrollbar flex-shrink-0 flex items-start md:items-center px-6 sm:px-16 md:px-32 relative py-12 md:py-0">
+            <motion.section key={pageIndex} 
+          initial={isMobile ? { opacity: 0, y: 50 } : false}
+          whileInView={isMobile ? { opacity: 1, y: 0 } : false}
+          viewport={{ once: false, amount: 0.1 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="w-full md:w-screen min-h-screen md:h-screen overflow-hidden md:overflow-y-auto no-scrollbar flex-shrink-0 flex items-start md:items-center px-6 sm:px-16 md:px-32 relative py-12 md:py-0">
               <div className="flex flex-col md:flex-row w-full max-w-7xl mx-auto items-stretch justify-center gap-8 md:gap-16">
                 
                 {/* Column 1: Title */}
@@ -1096,12 +1121,17 @@ export default function App() {
                   </div>
                 </RevealMotionDiv>
               </div>
-            </section>
+            </motion.section>
           );
         })}
 
         {/* Final Page: CV (Image 3) */}
-        <section className="w-full md:w-screen min-h-screen md:h-screen overflow-hidden md:overflow-y-auto no-scrollbar flex-shrink-0 flex items-start md:items-center justify-center px-6 sm:px-16 md:px-32 relative py-24 md:py-0">
+        <motion.section 
+          initial={isMobile ? { opacity: 0, y: 50 } : false}
+          whileInView={isMobile ? { opacity: 1, y: 0 } : false}
+          viewport={{ once: false, amount: 0.1 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="w-full md:w-screen min-h-screen md:h-screen overflow-hidden md:overflow-y-auto no-scrollbar flex-shrink-0 flex items-start md:items-center justify-center px-6 sm:px-16 md:px-32 relative py-24 md:py-0">
           <RevealMotionDiv
             variants={staggerContainer}
             initial="hidden"
@@ -1218,7 +1248,7 @@ export default function App() {
           >
             ● 2026 ESTEBAN ERAZO - Made With Love
           </motion.div>
-        </section>
+        </motion.section>
       </motion.div>
 
       {/* Dynamic Page Indicators */}
