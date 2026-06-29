@@ -634,8 +634,7 @@ export default function App() {
             }
           }
         }}
-        className={`fixed inset-0 w-screen h-screen ${isMobile ? 'overflow-y-auto overflow-x-hidden snap-y snap-mandatory scroll-smooth' : 'overflow-hidden'} bg-[#05070a] text-white selection:bg-brand-red/30`}
-        style={isMobile ? { WebkitOverflowScrolling: 'touch' } : undefined}
+        className={`fixed inset-0 w-screen h-screen ${isMobile ? 'overflow-y-auto overflow-x-hidden' : 'overflow-hidden'} bg-[#05070a] text-white selection:bg-brand-red/30`}
       >
         <motion.div
           className="fixed top-0 left-0 h-1 bg-[#990000] z-50 shadow-[0_0_8px_rgba(153,0,0,0.8)]"
@@ -677,35 +676,40 @@ export default function App() {
       </div>
 
       {/* Main horizontal sliding container (stacked vertically on mobile) */}
-      <motion.div
-        className="flex flex-col md:flex-row h-auto md:h-full relative z-10"
-        drag={isMobile ? "x" : false}
-        dragConstraints={{ left: 0, right: 0 }}
-        style={{ 
-          width: isMobile ? "100%" : `${(5 + certPagesCount) * 100}vw`,
-          height: isMobile ? "auto" : "100%"
-        }}
-        animate={isMobile ? undefined : { 
-          x: `-${
-            currentPage < 3 
-              ? currentPage * 100 
-              : isProjectPage 
-                ? 300 
-                : isCertPage
-                  ? 400 + (currentPage - (3 + projectPagesCount)) * 100
-                  : 400 + certPagesCount * 100
-          }vw`,
-          y: 0
-        }}
-        transition={{ duration: 1.25, ease: APPLE_EASE }}
-      >
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={isMobile ? 'mobile' : currentPage}
+          initial={isMobile ? false : { opacity: 0 }}
+          exit={isMobile ? undefined : { opacity: 0 }}
+          className="flex flex-col md:flex-row h-full relative z-10"
+          drag={isMobile ? "x" : false}
+          dragConstraints={{ left: 0, right: 0 }}
+          style={{ 
+            width: isMobile ? "100%" : `${(5 + certPagesCount) * 100}vw`,
+            height: isMobile ? "auto" : "100%"
+          }}
+          animate={isMobile ? undefined : { 
+            opacity: 1,
+            x: `-${
+              currentPage < 3 
+                ? currentPage * 100 
+                : isProjectPage 
+                  ? 300 
+                  : isCertPage
+                    ? 400 + (currentPage - (3 + projectPagesCount)) * 100
+                    : 400 + certPagesCount * 100
+            }vw`,
+            y: 0
+          }}
+          transition={{ duration: 0.8, ease: APPLE_EASE }}
+        >
         {/* Page 1: Intro (Image 6) */}
         <motion.section 
           initial={isMobile ? { opacity: 0, y: 50 } : false}
           whileInView={isMobile ? { opacity: 1, y: 0 } : false}
           viewport={{ once: false, amount: 0.1 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
-          className="w-full md:w-screen min-h-screen md:h-screen snap-start md:overflow-y-auto no-scrollbar flex-shrink-0 flex flex-col justify-center px-6 sm:px-16 md:px-32 relative py-24 md:py-0">
+          className="w-full md:w-screen min-h-screen md:h-screen overflow-hidden md:overflow-y-auto no-scrollbar flex-shrink-0 flex flex-col justify-center px-6 sm:px-16 md:px-32 relative py-24 md:py-0">
           <RevealMotionDiv
             variants={staggerContainer}
             initial="hidden"
@@ -759,7 +763,7 @@ export default function App() {
           whileInView={isMobile ? { opacity: 1, y: 0 } : false}
           viewport={{ once: false, amount: 0.1 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
-          className="w-full md:w-screen min-h-screen md:h-screen snap-start md:overflow-y-auto no-scrollbar flex-shrink-0 flex flex-col justify-center px-6 sm:px-16 md:px-32 relative py-24 md:py-0">
+          className="w-full md:w-screen min-h-screen md:h-screen overflow-hidden md:overflow-y-auto no-scrollbar flex-shrink-0 flex flex-col justify-center px-6 sm:px-16 md:px-32 relative py-24 md:py-0">
           <RevealMotionDiv
             variants={staggerContainer}
             initial="hidden"
@@ -806,7 +810,7 @@ export default function App() {
           whileInView={isMobile ? { opacity: 1, y: 0 } : false}
           viewport={{ once: false, amount: 0.1 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
-          className="w-full md:w-screen min-h-screen md:h-screen snap-start md:overflow-y-auto no-scrollbar flex-shrink-0 flex items-start md:items-center px-6 sm:px-16 md:px-32 relative py-12 md:py-0">
+          className="w-full md:w-screen min-h-screen md:h-screen overflow-hidden md:overflow-y-auto no-scrollbar flex-shrink-0 flex items-start md:items-center px-6 sm:px-16 md:px-32 relative py-12 md:py-0">
           <div className="flex flex-col md:flex-row w-full items-stretch justify-center gap-6 md:gap-0">
             
             {/* Column 1 */}
@@ -890,7 +894,7 @@ export default function App() {
           whileInView={isMobile ? { opacity: 1, y: 0 } : false}
           viewport={{ once: false, amount: 0.1 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
-          className="w-full min-h-screen h-screen overflow-hidden snap-start relative cursor-pointer group" onClick={() => window.open(project.url, "_blank")}>
+          className="w-full min-h-screen h-screen overflow-hidden relative cursor-pointer group" onClick={() => window.open(project.url, "_blank")}>
                 {/* Background Graphic / Photo */}
                 <div className="absolute inset-0">
                   <ProjectImageWrapper
@@ -1051,7 +1055,7 @@ export default function App() {
           whileInView={isMobile ? { opacity: 1, y: 0 } : false}
           viewport={{ once: false, amount: 0.1 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
-          className="w-full md:w-screen min-h-screen md:h-screen snap-start md:overflow-y-auto no-scrollbar flex-shrink-0 flex items-start md:items-center px-6 sm:px-16 md:px-32 relative py-12 md:py-0">
+          className="w-full md:w-screen min-h-screen md:h-screen overflow-hidden md:overflow-y-auto no-scrollbar flex-shrink-0 flex items-start md:items-center px-6 sm:px-16 md:px-32 relative py-12 md:py-0">
               <div className="flex flex-col md:flex-row w-full max-w-7xl mx-auto items-stretch justify-center gap-8 md:gap-16">
                 
                 {/* Column 1: Title */}
@@ -1137,7 +1141,7 @@ export default function App() {
           whileInView={isMobile ? { opacity: 1, y: 0 } : false}
           viewport={{ once: false, amount: 0.1 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
-          className="w-full md:w-screen min-h-screen md:h-screen snap-start md:overflow-y-auto no-scrollbar flex-shrink-0 flex items-start md:items-center justify-center px-6 sm:px-16 md:px-32 relative py-24 md:py-0">
+          className="w-full md:w-screen min-h-screen md:h-screen overflow-hidden md:overflow-y-auto no-scrollbar flex-shrink-0 flex items-start md:items-center justify-center px-6 sm:px-16 md:px-32 relative py-24 md:py-0">
           <RevealMotionDiv
             variants={staggerContainer}
             initial="hidden"
@@ -1255,6 +1259,7 @@ export default function App() {
           </motion.div>
         </motion.section>
       </motion.div>
+      </AnimatePresence>
 
       {/* Dynamic Page Indicators */}
       <div className="fixed bottom-8 left-1/2 -translate-x-1/2 flex-col items-center gap-2 z-50 hidden md:flex">
