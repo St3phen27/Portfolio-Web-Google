@@ -773,16 +773,16 @@ export default function App() {
             className="space-y-4 md:space-y-4 w-full flex flex-col items-center justify-center h-full"
           >
             <div className="overflow-hidden flex w-fit justify-start">
-              <InteractiveWord text="NO LLORES" className="text-[14vw] sm:text-5xl md:text-[4rem] lg:text-[5rem] font-bold tracking-tighter leading-[0.9] text-left" />
+              <InteractiveWord text="NO LLORES" className="text-[10.5vw] sm:text-5xl md:text-[4rem] lg:text-[5rem] font-bold tracking-tighter leading-[0.9] text-left" />
             </div>
             <div className="overflow-hidden flex w-fit justify-start">
-              <InteractiveWord text="PORQUE TERMINÓ," className="text-[11vw] sm:text-6xl md:text-[5rem] lg:text-[6.5rem] font-bold tracking-tighter leading-[0.9] text-left" />
+              <InteractiveWord text="PORQUE TERMINÓ," className="text-[8.25vw] sm:text-6xl md:text-[5rem] lg:text-[6.5rem] font-bold tracking-tighter leading-[0.9] text-left" />
             </div>
             <div className="overflow-hidden flex w-fit justify-start">
-              <InteractiveWord text="SONRÍE PORQUE" className="text-[11.5vw] sm:text-7xl md:text-[6rem] lg:text-[8rem] font-bold tracking-tighter leading-[0.9] text-left" />
+              <InteractiveWord text="SONRÍE PORQUE" className="text-[8.625vw] sm:text-7xl md:text-[6rem] lg:text-[8rem] font-bold tracking-tighter leading-[0.9] text-left" />
             </div>
             <div className="overflow-hidden flex w-fit justify-start">
-              <InteractiveWord text="SUCEDIÓ" className="text-[19vw] sm:text-[7rem] md:text-[8.5rem] lg:text-[11rem] font-bold tracking-tighter leading-[0.9] text-[#990000] text-left" />
+              <InteractiveWord text="SUCEDIÓ" className="text-[14.25vw] sm:text-[7rem] md:text-[8.5rem] lg:text-[11rem] font-bold tracking-tighter leading-[0.9] text-[#990000] text-left" />
             </div>
           </RevealMotionDiv>
           <RevealMotionDiv 
@@ -793,7 +793,7 @@ export default function App() {
             amount={0.3}
             className="absolute bottom-32 sm:bottom-24 right-8 sm:right-16 md:right-32 text-right"
           >
-            <p className="text-xl font-bold opacity-80">Dr. Seuss / 1980` ~`</p>
+            <p className="text-xl font-bold opacity-80">Dr. Seuss / 1980~</p>
             <RevealMotionDiv 
               initial={{ scaleX: 0 }}
               isMobile={isMobile}
