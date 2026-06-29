@@ -249,6 +249,7 @@ export default function App() {
   const [profilePic, setProfilePic] = useState<string | null>(null);
   const [initStatus, setInitStatus] = useState<"loading" | "error" | "complete">("loading");
   const [progress, setProgress] = useState(0);
+  const [mobileScrollProgress, setMobileScrollProgress] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -258,7 +259,6 @@ export default function App() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const handlePrint = () => window.open('https://drive.google.com/file/d/11nczQcN9Gfn_VOHpnzg4B6IKOZXnXFaT/view', '_blank');
 
   // Disable right-click across the entire app
   useEffect(() => {
@@ -607,6 +607,11 @@ export default function App() {
           if (!isMobile) return;
           const target = e.currentTarget as HTMLElement;
           const scrollY = target.scrollTop;
+          const maxScroll = target.scrollHeight - target.clientHeight;
+          if (maxScroll > 0) {
+            setMobileScrollProgress(scrollY / maxScroll);
+          }
+          
           const windowHeight = window.innerHeight;
           const container = target.querySelector('.flex-col.md\\:flex-row');
           if (container) {
@@ -636,12 +641,49 @@ export default function App() {
         }}
         className={`fixed inset-0 w-screen h-screen ${isMobile ? 'overflow-y-auto overflow-x-hidden' : 'overflow-hidden'} bg-[#05070a] text-white selection:bg-brand-red/30`}
       >
-        <motion.div
-          className="fixed top-0 left-0 h-1 bg-[#990000] z-50 shadow-[0_0_8px_rgba(153,0,0,0.8)]"
-          initial={{ width: 0 }}
-          animate={{ width: `${(currentPage / Math.max(1, totalPages - 1)) * 100}%` }}
-          transition={{ type: "spring", stiffness: 120, damping: 25 }}
-        />
+        {isMobile ? (
+          <AnimatePresence>
+            {currentPage > 0 && (
+              <motion.div 
+                className="fixed top-4 right-4 w-8 h-8 z-50 pointer-events-none"
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+                transition={{ duration: 0.3 }}
+              >
+                <svg className="w-full h-full -rotate-90">
+                  <circle
+                    cx="16"
+                    cy="16"
+                    r="12"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    fill="transparent"
+                    className="text-gray-800"
+                  />
+                  <motion.circle
+                    cx="16"
+                    cy="16"
+                    r="12"
+                    stroke="#990000"
+                    strokeWidth="2"
+                    fill="transparent"
+                    strokeDasharray="75.4"
+                    animate={{ strokeDashoffset: 75.4 * (1 - mobileScrollProgress) }}
+                    transition={{ type: "spring", stiffness: 120, damping: 25 }}
+                  />
+                </svg>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        ) : (
+          <motion.div
+            className="fixed top-0 left-0 h-1 bg-[#990000] z-50 shadow-[0_0_8px_rgba(153,0,0,0.8)]"
+            initial={{ width: 0 }}
+            animate={{ width: `${(currentPage / Math.max(1, totalPages - 1)) * 100}%` }}
+            transition={{ type: "spring", stiffness: 120, damping: 25 }}
+          />
+        )}
       {/* Global Dynamic Geometric Background */}
       <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
         {backgroundShapes.map((shape, i) => (
@@ -1210,38 +1252,12 @@ export default function App() {
                 <motion.h5 variants={textReveal} className="text-4xl sm:text-5xl md:text-7xl font-bold tracking-tighter text-center">Curriculum Vitae</motion.h5>
               </div>
               
-              <div className="flex-1 flex flex-col shadow-2xl w-full border-2 border-black rounded-lg overflow-hidden group/pdf">
-                {/* Control Panel / Toolbar */}
-                <div className="bg-[#b0b0b0] p-3 flex items-center justify-between px-4 border-b-2 border-black">
-                  <div className="flex items-center gap-3">
-                    <div className="p-1.5 bg-black rounded shadow-inner">
-                      <FileText className="w-5 h-5 text-white" />
-                    </div>
-                    <span className="text-black font-medium text-sm md:text-base tracking-wide font-sans">CV_Esteban_Erazo_Narvaez.pdf</span>
-                  </div>
-                  
-                  <div className="flex items-center gap-1 md:gap-3">
-                    <button 
-                      onClick={handlePrint}
-                      className="p-1.5 px-3 bg-black hover:bg-gray-800 text-white rounded-md transition-all active:scale-95 shadow-md flex items-center gap-2" 
-                      title="Read / Print in new tab"
-                    >
-                      <span className="text-xs font-semibold uppercase tracking-wider hidden md:inline">Read / Print</span>
-                      <Printer className="w-4 h-4" strokeWidth={2.5} />
-                    </button>
-                  </div>
-                </div>
-
-                <div className="flex-1 bg-[#333333] relative p-4 md:p-8 flex justify-center overflow-auto no-scrollbar">
-                  {/* The actual viewer area */}
-                  <div className="w-full h-full max-w-4xl bg-white shadow-[0_1.25rem_3.125rem_rgba(0,0,0,0.5)] relative">
-                    <IframeWrapper
-                      src="https://drive.google.com/file/d/11nczQcN9Gfn_VOHpnzg4B6IKOZXnXFaT/preview"
-                      className="absolute inset-0 w-full h-full border-none"
-                      title="CV PDF"
-                    />
-                  </div>
-                </div>
+              <div className="flex-1 w-full relative">
+                <IframeWrapper
+                  src="https://drive.google.com/file/d/11nczQcN9Gfn_VOHpnzg4B6IKOZXnXFaT/preview"
+                  className="absolute inset-0 w-full h-full border-none"
+                  title="CV PDF"
+                />
               </div>
             </motion.div>
           </RevealMotionDiv>
