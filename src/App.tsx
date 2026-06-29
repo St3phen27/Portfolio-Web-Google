@@ -770,16 +770,19 @@ export default function App() {
             isMobile={isMobile}
             activeCondition={currentPage === 1}
             amount={0.3}
-            className="space-y-2 md:space-y-4 mt-20 md:mt-20 w-full"
+            className="space-y-4 md:space-y-4 w-full flex flex-col items-center justify-center h-full"
           >
-            <div className="overflow-hidden flex w-full">
-              <InteractiveWord text="NO LLORES PORQUE" className="text-[2.2rem] sm:text-5xl md:text-7xl lg:text-[4rem] font-bold tracking-tighter leading-[0.9] w-full break-words" />
+            <div className="overflow-hidden flex w-fit justify-start">
+              <InteractiveWord text="NO LLORES" className="text-[14vw] sm:text-5xl md:text-[4rem] lg:text-[5rem] font-bold tracking-tighter leading-[0.9] text-left" />
             </div>
-            <div className="overflow-hidden sm:ml-24 md:ml-48 flex w-full">
-              <InteractiveWord text="TERMINÓ, SONRIE" className="text-[2.8rem] sm:text-6xl md:text-7xl lg:text-[8rem] font-bold tracking-tighter leading-[0.9] w-full break-words" />
+            <div className="overflow-hidden flex w-fit justify-start">
+              <InteractiveWord text="PORQUE TERMINÓ," className="text-[11vw] sm:text-6xl md:text-[5rem] lg:text-[6.5rem] font-bold tracking-tighter leading-[0.9] text-left" />
             </div>
-            <div className="overflow-hidden flex w-full">
-              <InteractiveWord text="PORQUE SUCEDIÓ" className="text-[3.2rem] sm:text-7xl md:text-[9rem] lg:text-[12rem] font-bold tracking-tighter leading-[0.9] text-[#990000] w-full break-words" />
+            <div className="overflow-hidden flex w-fit justify-start">
+              <InteractiveWord text="SONRÍE PORQUE" className="text-[11.5vw] sm:text-7xl md:text-[6rem] lg:text-[8rem] font-bold tracking-tighter leading-[0.9] text-left" />
+            </div>
+            <div className="overflow-hidden flex w-fit justify-start">
+              <InteractiveWord text="SUCEDIÓ" className="text-[19vw] sm:text-[7rem] md:text-[8.5rem] lg:text-[11rem] font-bold tracking-tighter leading-[0.9] text-[#990000] text-left" />
             </div>
           </RevealMotionDiv>
           <RevealMotionDiv 
