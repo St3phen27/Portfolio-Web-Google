@@ -5,6 +5,8 @@ import { useRef, useEffect, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
 import { RevealMotionDiv } from "./components/RevealMotionDiv";
 import { ParallaxCard } from "./components/ParallaxCard";
+import { ProjectImageWrapper } from "./components/ProjectImageWrapper";
+import { IframeWrapper } from "./components/IframeWrapper";
 
 // Custom Home Icon to match the image
 const HomeIcon = () => (
@@ -634,6 +636,12 @@ export default function App() {
         }}
         className={`fixed inset-0 w-screen h-screen ${isMobile ? 'overflow-y-auto overflow-x-hidden' : 'overflow-hidden'} bg-[#05070a] text-white selection:bg-brand-red/30`}
       >
+        <motion.div
+          className="fixed top-0 left-0 h-1 bg-[#990000] z-50"
+          initial={{ width: 0 }}
+          animate={{ width: `${(currentPage / Math.max(1, totalPages - 1)) * 100}%` }}
+          transition={{ duration: 0.3 }}
+        />
       {/* Global Dynamic Geometric Background */}
       <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
         {backgroundShapes.map((shape, i) => (
@@ -884,14 +892,11 @@ export default function App() {
           className="w-full min-h-screen h-screen overflow-hidden relative cursor-pointer group" onClick={() => window.open(project.url, "_blank")}>
                 {/* Background Graphic / Photo */}
                 <div className="absolute inset-0">
-                  <ParallaxCard className="absolute inset-0">
-                  <img 
-                    src={project.bg_photo || "https://picsum.photos/seed/portfolio/1920/1080"} 
+                  <ProjectImageWrapper
+                    src={project.bg_photo || "https://picsum.photos/seed/portfolio/1920/1080"}
                     alt={project.name}
                     className="w-full h-full object-cover opacity-50 transition-opacity duration-700 group-hover:opacity-40"
-                    referrerPolicy="no-referrer"
                   />
-                  </ParallaxCard>
                   <div className="absolute inset-0 bg-black/50 pointer-events-none" />
                   
                   {!project.bg_photo && (
@@ -1227,12 +1232,11 @@ export default function App() {
                 <div className="flex-1 bg-[#333333] relative p-4 md:p-8 flex justify-center overflow-auto no-scrollbar">
                   {/* The actual viewer area */}
                   <div className="w-full h-full max-w-4xl bg-white shadow-[0_1.25rem_3.125rem_rgba(0,0,0,0.5)] relative">
-                    <iframe 
-                      src="https://drive.google.com/file/d/11nczQcN9Gfn_VOHpnzg4B6IKOZXnXFaT/preview" 
+                    <IframeWrapper
+                      src="https://drive.google.com/file/d/11nczQcN9Gfn_VOHpnzg4B6IKOZXnXFaT/preview"
                       className="absolute inset-0 w-full h-full border-none"
                       title="CV PDF"
-                      allow="autoplay"
-                    ></iframe>
+                    />
                   </div>
                 </div>
               </div>
