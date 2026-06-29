@@ -795,7 +795,7 @@ export default function App() {
               className="flex-1 flex flex-col justify-start md:pr-12 md:border-r-[3px] border-[#4a0000] py-4 md:py-0"
             >
               <div className="overflow-hidden py-2">
-                <motion.h3 variants={textReveal} className="text-3xl sm:text-5xl lg:text-6xl font-bold leading-none tracking-tighter">¿Quién<br className="hidden md:block" />soy?</motion.h3>
+                <motion.h3 variants={textReveal} className="text-3xl sm:text-5xl lg:text-6xl font-bold leading-none tracking-tighter">¿Quién <br className="hidden md:block" />soy?</motion.h3>
               </div>
               <motion.div variants={fadeUp} className="mt-4 md:mt-8 space-y-4 text-sm md:text-base text-white/70 font-medium leading-relaxed">
                 <p>
@@ -817,7 +817,7 @@ export default function App() {
               className="flex-1 flex flex-col justify-start md:px-12 md:border-r-[3px] border-[#4a0000] py-4 md:py-0"
             >
               <div className="overflow-hidden py-2">
-                <motion.h3 variants={textReveal} className="text-3xl sm:text-5xl lg:text-6xl font-bold leading-none tracking-tighter">¿Qué es lo<br className="hidden md:block" />que me motiva?</motion.h3>
+                <motion.h3 variants={textReveal} className="text-3xl sm:text-5xl lg:text-6xl font-bold leading-none tracking-tighter">¿Qué es lo <br className="hidden md:block" />que me motiva?</motion.h3>
               </div>
               <motion.div variants={fadeUp} className="mt-4 md:mt-8 space-y-4 text-sm md:text-base text-white/70 font-medium leading-relaxed">
                 <p>
