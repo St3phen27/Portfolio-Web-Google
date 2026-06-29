@@ -634,7 +634,8 @@ export default function App() {
             }
           }
         }}
-        className={`fixed inset-0 w-screen h-screen ${isMobile ? 'overflow-y-auto overflow-x-hidden snap-y snap-mandatory' : 'overflow-hidden'} bg-[#05070a] text-white selection:bg-brand-red/30`}
+        className={`fixed inset-0 w-screen h-screen ${isMobile ? 'overflow-y-auto overflow-x-hidden snap-y snap-mandatory scroll-smooth' : 'overflow-hidden'} bg-[#05070a] text-white selection:bg-brand-red/30`}
+        style={isMobile ? { WebkitOverflowScrolling: 'touch' } : undefined}
       >
         <motion.div
           className="fixed top-0 left-0 h-1 bg-[#990000] z-50 shadow-[0_0_8px_rgba(153,0,0,0.8)]"
