@@ -637,10 +637,10 @@ export default function App() {
         className={`fixed inset-0 w-screen h-screen ${isMobile ? 'overflow-y-auto overflow-x-hidden' : 'overflow-hidden'} bg-[#05070a] text-white selection:bg-brand-red/30`}
       >
         <motion.div
-          className="fixed top-0 left-0 h-1 bg-[#990000] z-50"
+          className="fixed top-0 left-0 h-1 bg-[#990000] z-50 shadow-[0_0_8px_rgba(153,0,0,0.8)]"
           initial={{ width: 0 }}
           animate={{ width: `${(currentPage / Math.max(1, totalPages - 1)) * 100}%` }}
-          transition={{ duration: 0.3 }}
+          transition={{ type: "spring", stiffness: 120, damping: 25 }}
         />
       {/* Global Dynamic Geometric Background */}
       <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
