@@ -600,7 +600,40 @@ export default function App() {
         )}
       </AnimatePresence>
 
-      <main className={`fixed inset-0 w-screen h-screen ${isMobile ? 'overflow-y-auto overflow-x-hidden' : 'overflow-hidden'} bg-[#05070a] text-white selection:bg-brand-red/30`}>
+      <main 
+        onScroll={(e) => {
+          if (!isMobile) return;
+          const target = e.currentTarget as HTMLElement;
+          const scrollY = target.scrollTop;
+          const windowHeight = window.innerHeight;
+          const container = target.querySelector('.flex-col.md\\:flex-row');
+          if (container) {
+            const sections = container.children;
+            let minDistance = Infinity;
+            let closestIndex = 0;
+            const scrollCenter = scrollY + windowHeight / 2;
+            
+            let logicalIndex = 0;
+            for (let i = 0; i < sections.length; i++) {
+              const section = sections[i] as HTMLElement;
+              if (section.tagName !== 'SECTION') continue;
+              
+              const sectionCenter = section.offsetTop + section.offsetHeight / 2;
+              const distance = Math.abs(scrollCenter - sectionCenter);
+              if (distance < minDistance) {
+                minDistance = distance;
+                closestIndex = logicalIndex;
+              }
+              logicalIndex++;
+            }
+            
+            if (closestIndex !== currentPage) {
+              setCurrentPage(closestIndex);
+            }
+          }
+        }}
+        className={`fixed inset-0 w-screen h-screen ${isMobile ? 'overflow-y-auto overflow-x-hidden' : 'overflow-hidden'} bg-[#05070a] text-white selection:bg-brand-red/30`}
+      >
       {/* Global Dynamic Geometric Background */}
       <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
         {backgroundShapes.map((shape, i) => (
