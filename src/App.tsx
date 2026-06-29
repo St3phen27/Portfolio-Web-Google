@@ -515,7 +515,7 @@ export default function App() {
 
   return (
     <>
-      <CustomCursor />
+      {!isMobile && <CustomCursor />}
 
       <AnimatePresence>
         {initStatus !== "complete" && (
