@@ -4,6 +4,7 @@ import { ArrowRight, ArrowDown, Github, Linkedin, Instagram, FileText, Printer }
 import { useRef, useEffect, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
 import { RevealMotionDiv } from "./components/RevealMotionDiv";
+import { ParallaxCard } from "./components/ParallaxCard";
 
 // Custom Home Icon to match the image
 const HomeIcon = () => (
@@ -829,14 +830,16 @@ export default function App() {
             return (
               <section key={project.id_proyect} className="w-full min-h-screen h-screen overflow-hidden relative cursor-pointer group" onClick={() => window.open(project.url, "_blank")}>
                 {/* Background Graphic / Photo */}
-                <div className="absolute inset-0 pointer-events-none">
+                <div className="absolute inset-0">
+                  <ParallaxCard className="absolute inset-0">
                   <img 
                     src={project.bg_photo || "https://picsum.photos/seed/portfolio/1920/1080"} 
                     alt={project.name}
                     className="w-full h-full object-cover opacity-50 transition-opacity duration-700 group-hover:opacity-40"
                     referrerPolicy="no-referrer"
                   />
-                  <div className="absolute inset-0 bg-black/50" />
+                  </ParallaxCard>
+                  <div className="absolute inset-0 bg-black/50 pointer-events-none" />
                   
                   {!project.bg_photo && (
                     <>
@@ -910,14 +913,16 @@ export default function App() {
                     onClick={() => window.open(project.url, "_blank")}
                   >
                     {/* Background Graphic / Photo */}
-                    <div className="absolute inset-0 pointer-events-none">
+                    <div className="absolute inset-0">
+                      <ParallaxCard className="absolute inset-0">
                       <img 
                         src={project.bg_photo || "https://picsum.photos/seed/portfolio/1920/1080"} 
                         alt={project.name}
                         className="w-full h-full object-cover opacity-50 transition-opacity duration-700 group-hover:opacity-40"
                         referrerPolicy="no-referrer"
                       />
-                      <div className="absolute inset-0 bg-black/50" />
+                      </ParallaxCard>
+                      <div className="absolute inset-0 bg-black/50 pointer-events-none" />
                       
                       {!project.bg_photo && (
                         <>
