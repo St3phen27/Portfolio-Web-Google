@@ -809,16 +809,16 @@ export default function App() {
             amount={0.3}
             className="space-y-4 md:space-y-4 w-full flex flex-col items-center justify-center h-full"
           >
-            <div className="overflow-hidden flex w-fit justify-start">
+            <div className="flex w-fit justify-start">
               <InteractiveWord text="NO LLORES" className="text-[10.5vw] sm:text-5xl md:text-[4rem] lg:text-[5rem] font-bold tracking-tighter leading-[0.9] text-left" />
             </div>
-            <div className="overflow-hidden flex w-fit justify-start">
+            <div className="flex w-fit justify-start">
               <InteractiveWord text="PORQUE TERMINÓ," className="text-[8.25vw] sm:text-6xl md:text-[5rem] lg:text-[6.5rem] font-bold tracking-tighter leading-[0.9] text-left" />
             </div>
-            <div className="overflow-hidden flex w-fit justify-start">
+            <div className="flex w-fit justify-start">
               <InteractiveWord text="SONRÍE PORQUE" className="text-[8.625vw] sm:text-7xl md:text-[6rem] lg:text-[8rem] font-bold tracking-tighter leading-[0.9] text-left" />
             </div>
-            <div className="overflow-hidden flex w-fit justify-start">
+            <div className="flex w-fit justify-start">
               <InteractiveWord text="SUCEDIÓ" className="text-[14.25vw] sm:text-[7rem] md:text-[8.5rem] lg:text-[11rem] font-bold tracking-tighter leading-[0.9] text-[#990000] text-left" />
             </div>
           </RevealMotionDiv>
