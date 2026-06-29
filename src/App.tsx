@@ -676,33 +676,28 @@ export default function App() {
       </div>
 
       {/* Main horizontal sliding container (stacked vertically on mobile) */}
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={isMobile ? 'mobile' : currentPage}
-          initial={isMobile ? false : { opacity: 0 }}
-          exit={isMobile ? undefined : { opacity: 0 }}
-          className="flex flex-col md:flex-row h-full relative z-10"
-          drag={isMobile ? "x" : false}
-          dragConstraints={{ left: 0, right: 0 }}
-          style={{ 
-            width: isMobile ? "100%" : `${(5 + certPagesCount) * 100}vw`,
-            height: isMobile ? "auto" : "100%"
-          }}
-          animate={isMobile ? undefined : { 
-            opacity: 1,
-            x: `-${
-              currentPage < 3 
-                ? currentPage * 100 
-                : isProjectPage 
-                  ? 300 
-                  : isCertPage
-                    ? 400 + (currentPage - (3 + projectPagesCount)) * 100
-                    : 400 + certPagesCount * 100
-            }vw`,
-            y: 0
-          }}
-          transition={{ duration: 0.8, ease: APPLE_EASE }}
-        >
+      <motion.div
+        className="flex flex-col md:flex-row h-full relative z-10"
+        drag={isMobile ? "x" : false}
+        dragConstraints={{ left: 0, right: 0 }}
+        style={{ 
+          width: isMobile ? "100%" : `${(5 + certPagesCount) * 100}vw`,
+          height: isMobile ? "auto" : "100%"
+        }}
+        animate={isMobile ? undefined : { 
+          x: `-${
+            currentPage < 3 
+              ? currentPage * 100 
+              : isProjectPage 
+                ? 300 
+                : isCertPage
+                  ? 400 + (currentPage - (3 + projectPagesCount)) * 100
+                  : 400 + certPagesCount * 100
+          }vw`,
+          y: 0
+        }}
+        transition={{ duration: 1.25, ease: APPLE_EASE }}
+      >
         {/* Page 1: Intro (Image 6) */}
         <motion.section 
           initial={isMobile ? { opacity: 0, y: 50 } : false}
@@ -1262,7 +1257,6 @@ export default function App() {
           </motion.div>
         </motion.section>
       </motion.div>
-      </AnimatePresence>
 
       {/* Dynamic Page Indicators */}
       <div className="fixed bottom-8 left-1/2 -translate-x-1/2 flex-col items-center gap-2 z-50 hidden md:flex">
