@@ -713,15 +713,15 @@ export default function App() {
             amount={0.3}
             className="space-y-0"
           >
-            <div className="overflow-hidden py-2">
+            <div className="overflow-hidden py-0 md:py-2">
               <motion.h1 variants={textReveal} className="text-6xl sm:text-7xl lg:text-8xl 2xl:text-[10rem] font-bold tracking-tighter leading-[0.8]">Esteban</motion.h1>
             </div>
-            <div className="overflow-hidden py-2">
+            <div className="overflow-hidden py-0 md:py-2">
               <motion.h1 variants={textReveal} className="text-6xl sm:text-7xl lg:text-8xl 2xl:text-[10rem] font-bold tracking-tighter leading-[0.8] text-[#990000]">Erazo Narváez</motion.h1>
             </div>
-            <motion.div variants={fadeUp} className="flex flex-col sm:flex-row gap-2 sm:gap-4 text-lg sm:text-2xl lg:text-3xl 2xl:text-5xl font-bold text-[#4a0000] pt-8">
+            <motion.div variants={fadeUp} className="flex flex-col sm:flex-row gap-0 sm:gap-4 text-lg sm:text-2xl lg:text-3xl 2xl:text-5xl font-bold text-[#4a0000] pt-4 md:pt-8">
               <span>Ingeniero en Sistemas</span>
-              <span>Especialista en Seguridad Informática</span>
+              <span className="-mt-1 sm:mt-0">Especialista en Seguridad Informática</span>
             </motion.div>
           </RevealMotionDiv>
           
