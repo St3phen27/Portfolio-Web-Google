@@ -636,6 +636,8 @@ export default function App() {
       {/* Main horizontal sliding container (stacked vertically on mobile) */}
       <motion.div
         className="flex flex-col md:flex-row h-full relative z-10"
+        drag={isMobile ? "x" : false}
+        dragConstraints={{ left: 0, right: 0 }}
         style={{ 
           width: isMobile ? "100%" : `${(5 + certPagesCount) * 100}vw`,
           height: isMobile ? "auto" : "100%"
